@@ -95,10 +95,10 @@ display: flex; flex-direction: column; align-items: center; text-align: center;
 
 .hero-title {
 font-family: var(–font-display);
-font-size: clamp(54px, 7.5vw, 105px);
+font-size: clamp(48px, 6vw, 88px);
 line-height: 0.95; letter-spacing: 2px;
 color: #FFFFFF;
-margin-bottom: 16px;
+margin-bottom: 12px;
 }
 .hero-title .aqua { color: var(–aqua); }
 .hero-title .outline {
@@ -110,8 +110,8 @@ font-family: var(–font-display);
 
 /* Video */
 .hero-video-wrap {
-width: 100%; max-width: 700px;
-margin: 16px auto;
+width: 100%; max-width: 580px;
+margin: 12px auto;
 border-radius: 10px; overflow: hidden;
 border: 1px solid rgba(42,184,212,0.35);
 box-shadow: 0 0 60px rgba(42,184,212,0.18);
@@ -179,18 +179,19 @@ font-family: var(–font-sans); transition: all 0.2s;
 
 .btn-secondary {
 display: inline-flex; align-items: center; gap: 8px;
-background: transparent; color: rgba(255,255,255,0.7);
+background: none; color: rgba(255,255,255,0.6);
 font-size: 14px; font-weight: 400; letter-spacing: 0.5px;
-padding: 15px 26px; border-radius: 4px;
-text-decoration: none; border: 1px solid rgba(255,255,255,0.2);
+padding: 15px 26px; border-radius: 0;
+text-decoration: none; border: none; outline: none;
 font-family: var(–font-sans); transition: all 0.2s;
+box-shadow: none;
 }
-.btn-secondary:hover { border-color: var(–aqua); color: var(–aqua); }
+.btn-secondary:hover { color: var(–aqua); }
 
 /* Stats */
 .hero-stats {
 display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
-margin-top: 40px; padding-top: 30px;
+margin-top: 20px; padding-top: 20px;
 border-top: 1px solid rgba(255,255,255,0.1);
 }
 .stat-num { font-family: var(–font-display); font-size: 40px; color: var(–aqua); line-height: 1; letter-spacing: 1px; }
@@ -354,10 +355,12 @@ nav { padding: 14px 20px; }
 .hero { padding: 90px 20px 50px; }
 .hero-title { font-size: 58px; }
 .hero-sub { font-size: 16px; }
+.hero-stats { display: none; }
+.hero-ctas { flex-direction: column; width: 100%; }
+.btn-primary { width: 100%; justify-content: center; }
+.btn-secondary { display: none; }
 .problem, .solution, .pricing, .how, .trust, .cta-section, .demo { padding: 60px 20px; }
 footer { padding: 28px 20px; flex-direction: column; text-align: center; }
-.hero-stats { gap: 20px; }
-.stat-num { font-size: 32px; }
 .steps::before { display: none; }
 .apps-grid { grid-template-columns: 1fr; }
 .pricing-card.featured { transform: scale(1); }
