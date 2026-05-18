@@ -102,6 +102,7 @@ const TABS = [
 { id: "ads", label: "🎯 Ads & SMS" },
 { id: "tiktok", label: "🎬 TikTok" },
 { id: "neighbours", label: "✉️ Neighbours" },
+{ id: "schedule", label: "📅 Schedule" },
 ];
 
 function ProgressBar({ step, total }) {
@@ -335,9 +336,12 @@ setLoadingPct(75);
 setLoadingMsg("Writing TikTok script & neighbour letter...");
 const r4 = await askClaude(apiKey, SYSTEM,
 `Property info:\n${propSummary}${langInstruction}\n\nWrite this JSON:\n{"tiktok_script":"TikTok script with 3 labelled sections: HOOK (3 seconds, scroll-stopping opener), BODY (top 3 features dramatically), CTA (clear action). 45-55 seconds total when read aloud.","neighbour_letter":"200-220 word formal letter to neighbours. Start with Dear Neighbour, then 3 paragraphs: introduce the listing, top features and why rare, ask them to refer anyone looking. Sign off: Warm regards then ${agentName || "Your Agent"}${agentPhone ? " then " + agentPhone : ""}."}`, 900);
+setLoadingMsg("Building your posting schedule...");
+const r5 = await askClaude(apiKey, SYSTEM,
+`Property info:\n${propSummary}\nMode: ${mode}\n\nCreate a practical day-by-day marketing schedule for this property. Return ONLY this JSON:\n{"schedule":[{"day":"Day 1 — Launch Day","icon":"🚀","tasks":["Post MLS listing on all portals","Send WhatsApp broadcast to your database","Post Instagram caption with best property photo","Send SMS blast to hot leads","Email your buyer list with the email body","Hand-deliver neighbour letters within 500 metres"]},{"day":"Day 2","icon":"📱","tasks":["Post Facebook caption","Share LinkedIn post","Follow up by phone with anyone who replied to your WhatsApp"]},{"day":"Day 3","icon":"🎯","tasks":["Run Facebook and Instagram ad","Post Twitter/X update","Call any leads who opened your email but did not reply"]},{"day":"Day 5","icon":"🎬","tasks":["Post TikTok video using your script","Share behind-the-scenes story content on Instagram"]},{"day":"Day 7 — Week 1 Review","icon":"📊","tasks":["Check ad performance — pause what is not working","Re-send WhatsApp to anyone who did not open","Book any viewing requests that came in"]},{"day":"Day 10","icon":"🔄","tasks":["Post a second Instagram update — different angle or feature","Send a second email to your list with a fresh subject line"]},{"day":"Day 14 — Two Week Push","icon":"💥","tasks":["Lower ad budget if no strong leads — refocus spend","Call all leads who have not replied yet","Consider a price review if no serious interest"]},{"day":"Day 21","icon":"📣","tasks":["Post a testimonial or interest update on social media","Send final WhatsApp broadcast with urgency message","Run one last targeted ad push"]}]}`, 1000);
 setLoadingPct(100);
 
-setResult({ ...r1, ...r2, ...r3, ...r4 });
+setResult({ ...r1, ...r2, ...r3, ...r4, ...r5 });
 setActiveTab("listing");
 } catch (err) {
 setError(err.message);
@@ -418,6 +422,25 @@ fontSize: 12, fontWeight: activeTab === tab.id ? 700 : 400, fontFamily: "inherit
 {activeTab === "neighbours" && <>
 <p style={{ color: G.muted, fontSize: 13, margin: "0 0 14px" }}>Print and hand-deliver to nearby neighbours.</p>
 <OutputCard title="Neighbour Letter" icon="✉️" content={result.neighbour_letter} />
+</>}
+{activeTab === "schedule" && <>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 18px" }}>Your day-by-day action plan. Follow this exactly and you will maximise every listing.</p>
+{result.schedule && result.schedule.map((day, i) => (
+<div key={i} style={{ background: "#0d1017", border: `1px solid ${G.border}`, borderRadius: 10, padding: "16px 18px", marginBottom: 14 }}>
+<div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+<span style={{ fontSize: 22 }}>{day.icon}</span>
+<span style={{ fontSize: 14, fontWeight: 700, color: G.gold }}>{day.day}</span>
+</div>
+<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+{day.tasks && day.tasks.map((task, j) => (
+<div key={j} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+<span style={{ color: G.gold, fontWeight: 700, flexShrink: 0, fontSize: 14 }}>→</span>
+<span style={{ fontSize: 14, color: "#d1d5db", lineHeight: 1.6 }}>{task}</span>
+</div>
+))}
+</div>
+</div>
+))}
 </>}
 </div>
 </div>
