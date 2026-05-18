@@ -293,6 +293,37 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
 .footer-links a { font-size: 12px; color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.2s; font-weight: 400; }
 .footer-links a:hover { color: var(--aqua); }
 
+/* LANGUAGE SELECTOR */
+.lang-selector {
+position: relative;
+display: flex; align-items: center;
+}
+.lang-btn {
+display: flex; align-items: center; gap: 6px;
+background: var(--white-faint); border: 1px solid var(--border);
+border-radius: 6px; padding: 6px 12px;
+font-size: 12px; font-weight: 600; color: var(--white-dim);
+cursor: pointer; font-family: 'Syne', sans-serif;
+transition: all 0.2s;
+}
+.lang-btn:hover { border-color: var(--aqua); color: var(--aqua); }
+.lang-dropdown {
+display: none; position: absolute; top: calc(100% + 8px); right: 0;
+background: var(--black-2); border: 1px solid var(--border);
+border-radius: 8px; overflow: hidden; min-width: 160px;
+box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 200;
+}
+.lang-dropdown.open { display: block; }
+.lang-option {
+display: flex; align-items: center; gap: 10px;
+padding: 10px 14px; font-size: 13px; font-weight: 500;
+color: var(--white-dim); cursor: pointer; transition: all 0.15s;
+border: none; background: none; width: 100%; text-align: left;
+font-family: 'Syne', sans-serif;
+}
+.lang-option:hover { background: var(--white-faint); color: var(--white); }
+.lang-option.active { color: var(--aqua); }
+
 /* FADE UP */
 .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
@@ -331,34 +362,60 @@ nav { padding: 0 32px; }
 <nav>
 <a href="#" class="nav-logo">STREAM<span>FLUX</span></a>
 <div class="nav-links">
-<a href="#solution">The Tools</a>
-<a href="#how">How It Works</a>
-<a href="#demo">Demo</a>
-<a href="#pricing">Pricing</a>
-<a href="#pricing" class="nav-cta">Get Started</a>
+<a href="#solution" data-i18n="nav_tools">The Tools</a>
+<a href="#how" data-i18n="nav_how">How It Works</a>
+<a href="#demo" data-i18n="nav_demo">Demo</a>
+<a href="#pricing" data-i18n="nav_pricing">Pricing</a>
+<div class="lang-selector">
+<button class="lang-btn" onclick="toggleLang()" id="langBtn">🌐 EN ▾</button>
+<div class="lang-dropdown" id="langDropdown">
+<button class="lang-option active" onclick="setLang('en')">🇺🇸 English</button>
+<button class="lang-option" onclick="setLang('es')">🇪🇸 Español</button>
+<button class="lang-option" onclick="setLang('pt')">🇧🇷 Português</button>
+<button class="lang-option" onclick="setLang('fr')">🇫🇷 Français</button>
+<button class="lang-option" onclick="setLang('ar')">🇦🇪 العربية</button>
+<button class="lang-option" onclick="setLang('zh')">🇨🇳 中文</button>
+<button class="lang-option" onclick="setLang('de')">🇩🇪 Deutsch</button>
+<button class="lang-option" onclick="setLang('it')">🇮🇹 Italiano</button>
+</div>
+</div>
+<a href="#pricing" class="nav-cta" data-i18n="nav_cta">Get Started</a>
 </div>
 <button class="hamburger" id="hamburger" onclick="toggleMenu()">
 <span></span><span></span><span></span>
 </button>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-<a href="#solution" onclick="toggleMenu()">The Tools</a>
-<a href="#how" onclick="toggleMenu()">How It Works</a>
-<a href="#demo" onclick="toggleMenu()">Demo</a>
-<a href="#pricing" onclick="toggleMenu()">Pricing</a>
-<a href="#pricing" class="mob-cta" onclick="toggleMenu()">Get Started</a>
+<a href="#solution" onclick="toggleMenu()" data-i18n="nav_tools">The Tools</a>
+<a href="#how" onclick="toggleMenu()" data-i18n="nav_how">How It Works</a>
+<a href="#demo" onclick="toggleMenu()" data-i18n="nav_demo">Demo</a>
+<a href="#pricing" onclick="toggleMenu()" data-i18n="nav_pricing">Pricing</a>
+<div style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+<p style="font-size: 11px; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 10px;">🌐 Language</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+<button onclick="setLang('en'); toggleMenu();" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white; font-size: 13px; padding: 7px 12px; cursor: pointer; font-family: inherit;">🇺🇸 EN</button>
+<button onclick="setLang('es'); toggleMenu();" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white; font-size: 13px; padding: 7px 12px; cursor: pointer; font-family: inherit;">🇪🇸 ES</button>
+<button onclick="setLang('pt'); toggleMenu();" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white; font-size: 13px; padding: 7px 12px; cursor: pointer; font-family: inherit;">🇧🇷 PT</button>
+<button onclick="setLang('fr'); toggleMenu();" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white; font-size: 13px; padding: 7px 12px; cursor: pointer; font-family: inherit;">🇫🇷 FR</button>
+<button onclick="setLang('ar'); toggleMenu();" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white; font-size: 13px; padding: 7px 12px; cursor: pointer; font-family: inherit;">🇦🇪 AR</button>
+<button onclick="setLang('zh'); toggleMenu();" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white; font-size: 13px; padding: 7px 12px; cursor: pointer; font-family: inherit;">🇨🇳 ZH</button>
+<button onclick="setLang('de'); toggleMenu();" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white; font-size: 13px; padding: 7px 12px; cursor: pointer; font-family: inherit;">🇩🇪 DE</button>
+<button onclick="setLang('it'); toggleMenu();" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white; font-size: 13px; padding: 7px 12px; cursor: pointer; font-family: inherit;">🇮🇹 IT</button>
+</div>
+</div>
+<a href="#pricing" class="mob-cta" onclick="toggleMenu()" data-i18n="nav_cta">Get Started</a>
 </div>
 
 <!-- HERO -->
 <section class="hero">
-<div class="hero-badge"><span class="badge-dot"></span> AI-Powered Real Estate Marketing</div>
-<h1 class="hero-title">
+<div class="hero-badge"><span class="badge-dot"></span> <span data-i18n="badge">AI-Powered Real Estate Marketing</span></div>
+<h1 class="hero-title" data-i18n="hero_title">
 Market faster.<br>Close <em>more.</em>
 </h1>
-<p class="hero-sub">Your full marketing package generated in seconds. Fill in the details, we do the rest.</p>
+<p class="hero-sub" data-i18n="hero_sub">Your full marketing package generated in seconds. Fill in the details, we do the rest.</p>
 <div class="hero-ctas">
-<a href="#pricing" class="btn-primary">Start Free Trial →</a>
-<a href="#solution" class="btn-outline">See the Tools</a>
+<a href="#pricing" class="btn-primary" data-i18n="hero_cta1">Start Free Trial →</a>
+<a href="#solution" class="btn-outline" data-i18n="hero_cta2">See the Tools</a>
 </div>
 <div class="hero-video-wrap">
 <div class="hero-video-inner">
@@ -383,9 +440,9 @@ Market faster.<br>Close <em>more.</em>
 <!-- PROBLEM -->
 <section class="problem" id="problem">
 <div class="section-inner">
-<div class="section-label fade-up">The Problem</div>
-<h2 class="section-title fade-up">Agents are <em>drowning</em><br>in repetitive work.</h2>
-<p class="section-sub fade-up">Writing listings, social posts, emails, follow-ups, letters — manually, every day. Hours wasted. Deals missed. Money left on the table.</p>
+<div class="section-label fade-up" data-i18n="prob_label">The Problem</div>
+<h2 class="section-title fade-up" data-i18n="prob_title">Agents are <em>drowning</em><br>in repetitive work.</h2>
+<p class="section-sub fade-up" data-i18n="prob_sub">Writing listings, social posts, emails, follow-ups, letters — manually, every day. Hours wasted. Deals missed. Money left on the table.</p>
 <div class="pain-grid fade-up">
 <div class="pain-card"><span class="pain-icon">⏰</span><div class="pain-title">Hours Writing Content</div><p class="pain-desc">The average agent spends 5-8 hours per week writing listing descriptions, captions, and emails. Time that should be spent closing deals.</p></div>
 <div class="pain-card"><span class="pain-icon">📉</span><div class="pain-title">Inconsistent Follow-Up</div><p class="pain-desc">Most agents follow up once or twice then give up. 80% of sales happen after the 5th contact. Leads go cold. Commissions disappear.</p></div>
@@ -572,10 +629,10 @@ Market faster.<br>Close <em>more.</em>
 <!-- CTA -->
 <section class="cta-section">
 <div class="section-inner" style="position:relative;">
-<h2 class="cta-title fade-up">Stop writing.<br><em>Start closing.</em></h2>
-<p class="cta-sub fade-up">Join agents already using Streamflux to market listings faster, follow up smarter, and close more deals.</p>
+<h2 class="cta-title fade-up" data-i18n="cta_title">Stop writing.<br><em>Start closing.</em></h2>
+<p class="cta-sub fade-up" data-i18n="cta_sub">Join agents already using Streamflux to market listings faster, follow up smarter, and close more deals.</p>
 <div class="cta-buttons">
-<a href="#pricing" class="btn-primary">Get Started Today →</a>
+<a href="#pricing" class="btn-primary" data-i18n="cta_btn">Get Started Today →</a>
 <a href="#solution" class="btn-outline">See the Tools</a>
 </div>
 </div>
@@ -593,6 +650,189 @@ function toggleMenu() {
 document.getElementById('mobileMenu').classList.toggle('open');
 document.getElementById('hamburger').classList.toggle('open');
 }
+
+// ── LANGUAGE SYSTEM ──
+const LANGS = {
+en: {
+flag: '🇺🇸', code: 'EN',
+nav_tools: 'The Tools', nav_how: 'How It Works', nav_demo: 'Demo', nav_pricing: 'Pricing', nav_cta: 'Get Started',
+badge: 'AI-Powered Real Estate Marketing',
+hero_title: 'Market faster.<br>Close <em>more.</em>',
+hero_sub: 'Your full marketing package generated in seconds. Fill in the details, we do the rest.',
+hero_cta1: 'Start Free Trial →', hero_cta2: 'See the Tools',
+prob_label: 'The Problem', prob_title: 'Agents are <em>drowning</em><br>in repetitive work.',
+prob_sub: 'Writing listings, social posts, emails, follow-ups, letters — manually, every day. Hours wasted. Deals missed. Money left on the table.',
+sol_label: 'The Solution', sol_title: 'Two powerful tools.<br><em>One complete system.</em>',
+how_label: 'How It Works', how_title: 'Simple as <em>three steps.</em>',
+demo_label: 'See It In Action', demo_title: 'Watch how <em>simple it is.</em>',
+pricing_label: 'Pricing', pricing_title: 'Simple, transparent pricing.',
+pricing_sub: 'No contracts. No hidden fees. Cancel anytime. Start today.',
+cta_title: 'Stop writing.<br><em>Start closing.</em>',
+cta_sub: 'Join agents already using Streamflux to market listings faster, follow up smarter, and close more deals.',
+cta_btn: 'Get Started Today →',
+},
+es: {
+flag: '🇪🇸', code: 'ES',
+nav_tools: 'Las Herramientas', nav_how: 'Cómo Funciona', nav_demo: 'Demo', nav_pricing: 'Precios', nav_cta: 'Empezar',
+badge: 'Marketing Inmobiliario con IA',
+hero_title: 'Vende más rápido.<br>Cierra <em>más.</em>',
+hero_sub: 'Tu paquete completo de marketing generado en segundos. Rellena los datos, nosotros hacemos el resto.',
+hero_cta1: 'Prueba Gratis →', hero_cta2: 'Ver las Herramientas',
+prob_label: 'El Problema', prob_title: 'Los agentes se <em>ahogan</em><br>en trabajo repetitivo.',
+prob_sub: 'Escribir listados, publicaciones, emails, seguimientos, cartas — manualmente, cada día. Horas perdidas. Tratos perdidos.',
+sol_label: 'La Solución', sol_title: 'Dos herramientas potentes.<br><em>Un sistema completo.</em>',
+how_label: 'Cómo Funciona', how_title: 'Simple en <em>tres pasos.</em>',
+demo_label: 'Véalo en Acción', demo_title: 'Mira lo <em>fácil que es.</em>',
+pricing_label: 'Precios', pricing_title: 'Precios simples y transparentes.',
+pricing_sub: 'Sin contratos. Sin cargos ocultos. Cancela cuando quieras.',
+cta_title: 'Deja de escribir.<br><em>Empieza a cerrar.</em>',
+cta_sub: 'Únete a los agentes que ya usan Streamflux para vender más rápido y cerrar más tratos.',
+cta_btn: 'Empezar Hoy →',
+},
+pt: {
+flag: '🇧🇷', code: 'PT',
+nav_tools: 'As Ferramentas', nav_how: 'Como Funciona', nav_demo: 'Demo', nav_pricing: 'Preços', nav_cta: 'Começar',
+badge: 'Marketing Imobiliário com IA',
+hero_title: 'Venda mais rápido.<br>Feche <em>mais.</em>',
+hero_sub: 'Seu pacote completo de marketing gerado em segundos. Preencha os detalhes, nós fazemos o resto.',
+hero_cta1: 'Teste Grátis →', hero_cta2: 'Ver as Ferramentas',
+prob_label: 'O Problema', prob_title: 'Corretores se <em>afogam</em><br>em trabalho repetitivo.',
+prob_sub: 'Escrever anúncios, posts, emails, follow-ups, cartas — manualmente, todo dia. Horas perdidas. Negócios perdidos.',
+sol_label: 'A Solução', sol_title: 'Duas ferramentas poderosas.<br><em>Um sistema completo.</em>',
+how_label: 'Como Funciona', how_title: 'Simples em <em>três passos.</em>',
+demo_label: 'Veja em Ação', demo_title: 'Veja como é <em>simples.</em>',
+pricing_label: 'Preços', pricing_title: 'Preços simples e transparentes.',
+pricing_sub: 'Sem contratos. Sem taxas ocultas. Cancele quando quiser.',
+cta_title: 'Pare de escrever.<br><em>Comece a fechar.</em>',
+cta_sub: 'Junte-se aos corretores que já usam o Streamflux para vender mais rápido e fechar mais negócios.',
+cta_btn: 'Começar Hoje →',
+},
+fr: {
+flag: '🇫🇷', code: 'FR',
+nav_tools: 'Les Outils', nav_how: 'Comment ça Marche', nav_demo: 'Démo', nav_pricing: 'Tarifs', nav_cta: 'Commencer',
+badge: 'Marketing Immobilier par IA',
+hero_title: 'Vendez plus vite.<br>Concluez <em>plus.</em>',
+hero_sub: 'Votre pack marketing complet généré en secondes. Remplissez les détails, on fait le reste.',
+hero_cta1: 'Essai Gratuit →', hero_cta2: 'Voir les Outils',
+prob_label: 'Le Problème', prob_title: 'Les agents <em>se noient</em><br>dans le travail répétitif.',
+prob_sub: 'Rédiger des annonces, posts, emails, relances, lettres — manuellement, chaque jour. Des heures perdues.',
+sol_label: 'La Solution', sol_title: 'Deux outils puissants.<br><em>Un système complet.</em>',
+how_label: 'Comment ça Marche', how_title: 'Simple en <em>trois étapes.</em>',
+demo_label: 'Voir en Action', demo_title: 'Voyez comme c\'est <em>simple.</em>',
+pricing_label: 'Tarifs', pricing_title: 'Tarifs simples et transparents.',
+pricing_sub: 'Sans engagement. Sans frais cachés. Résiliez quand vous voulez.',
+cta_title: 'Arrêtez d\'écrire.<br><em>Commencez à conclure.</em>',
+cta_sub: 'Rejoignez les agents qui utilisent déjà Streamflux pour vendre plus vite et conclure plus.',
+cta_btn: 'Commencer Aujourd\'hui →',
+},
+ar: {
+flag: '🇦🇪', code: 'AR',
+nav_tools: 'الأدوات', nav_how: 'كيف يعمل', nav_demo: 'عرض', nav_pricing: 'الأسعار', nav_cta: 'ابدأ الآن',
+badge: 'تسويق عقاري بالذكاء الاصطناعي',
+hero_title: 'سوّق أسرع.<br>أغلق <em>أكثر.</em>',
+hero_sub: 'حزمة التسويق الكاملة في ثوانٍ. أدخل التفاصيل، نحن نتولى الباقي.',
+hero_cta1: 'ابدأ مجاناً ←', hero_cta2: 'شاهد الأدوات',
+prob_label: 'المشكلة', prob_title: 'الوكلاء <em>يغرقون</em><br>في العمل المتكرر.',
+prob_sub: 'كتابة الإعلانات والمنشورات والبريد الإلكتروني يدوياً كل يوم. ساعات مهدرة. صفقات ضائعة.',
+sol_label: 'الحل', sol_title: 'أداتان قويتان.<br><em>نظام متكامل.</em>',
+how_label: 'كيف يعمل', how_title: 'بسيط في <em>ثلاث خطوات.</em>',
+demo_label: 'شاهده في العمل', demo_title: 'شاهد كم هو <em>بسيط.</em>',
+pricing_label: 'الأسعار', pricing_title: 'أسعار بسيطة وشفافة.',
+pricing_sub: 'بدون عقود. بدون رسوم خفية. ألغِ في أي وقت.',
+cta_title: 'توقف عن الكتابة.<br><em>ابدأ الإغلاق.</em>',
+cta_sub: 'انضم إلى الوكلاء الذين يستخدمون Streamflux للتسويق بشكل أسرع وإغلاق المزيد من الصفقات.',
+cta_btn: 'ابدأ اليوم ←',
+},
+zh: {
+flag: '🇨🇳', code: 'ZH',
+nav_tools: '工具', nav_how: '工作原理', nav_demo: '演示', nav_pricing: '定价', nav_cta: '开始使用',
+badge: 'AI驱动的房产营销',
+hero_title: '更快营销。<br>成交<em>更多。</em>',
+hero_sub: '几秒内生成完整营销包。填写详情，我们完成其余工作。',
+hero_cta1: '免费试用 →', hero_cta2: '查看工具',
+prob_label: '问题', prob_title: '经纪人<em>淹没</em>在重复工作中。',
+prob_sub: '每天手动撰写房源描述、社交帖子、邮件、跟进信息和信函。浪费时间，错失交易。',
+sol_label: '解决方案', sol_title: '两个强大工具。<br><em>一个完整系统。</em>',
+how_label: '工作原理', how_title: '<em>三步</em>简单操作。',
+demo_label: '实际演示', demo_title: '看看有多<em>简单。</em>',
+pricing_label: '定价', pricing_title: '简单透明的定价。',
+pricing_sub: '无合同。无隐藏费用。随时取消。',
+cta_title: '停止写作。<br><em>开始成交。</em>',
+cta_sub: '加入已在使用Streamflux的经纪人，更快营销，更聪明跟进，成交更多。',
+cta_btn: '立即开始 →',
+},
+de: {
+flag: '🇩🇪', code: 'DE',
+nav_tools: 'Die Tools', nav_how: 'Wie es funktioniert', nav_demo: 'Demo', nav_pricing: 'Preise', nav_cta: 'Loslegen',
+badge: 'KI-gestütztes Immobilienmarketing',
+hero_title: 'Schneller vermarkten.<br><em>Mehr</em> abschließen.',
+hero_sub: 'Ihr komplettes Marketingpaket in Sekunden erstellt. Details eingeben, wir erledigen den Rest.',
+hero_cta1: 'Kostenlos testen →', hero_cta2: 'Tools ansehen',
+prob_label: 'Das Problem', prob_title: 'Makler <em>ertrinken</em><br>in Routinearbeit.',
+prob_sub: 'Exposés, Social-Media-Posts, E-Mails, Nachfassaktionen — täglich manuell. Stunden verschwendet.',
+sol_label: 'Die Lösung', sol_title: 'Zwei leistungsstarke Tools.<br><em>Ein komplettes System.</em>',
+how_label: 'Wie es funktioniert', how_title: 'Einfach in <em>drei Schritten.</em>',
+demo_label: 'In Aktion sehen', demo_title: 'Sehen Sie, wie <em>einfach</em> es ist.',
+pricing_label: 'Preise', pricing_title: 'Einfache, transparente Preise.',
+pricing_sub: 'Keine Verträge. Keine versteckten Gebühren. Jederzeit kündbar.',
+cta_title: 'Aufhören zu schreiben.<br><em>Anfangen abzuschließen.</em>',
+cta_sub: 'Schließen Sie sich Maklern an, die Streamflux bereits nutzen, um schneller zu vermarkten.',
+cta_btn: 'Heute starten →',
+},
+it: {
+flag: '🇮🇹', code: 'IT',
+nav_tools: 'Gli Strumenti', nav_how: 'Come Funziona', nav_demo: 'Demo', nav_pricing: 'Prezzi', nav_cta: 'Inizia',
+badge: 'Marketing Immobiliare con IA',
+hero_title: 'Vendi più veloce.<br>Chiudi <em>di più.</em>',
+hero_sub: 'Il tuo pacchetto marketing completo generato in secondi. Inserisci i dettagli, pensiamo noi al resto.',
+hero_cta1: 'Prova Gratis →', hero_cta2: 'Vedi gli Strumenti',
+prob_label: 'Il Problema', prob_title: 'Gli agenti <em>annegano</em><br>nel lavoro ripetitivo.',
+prob_sub: 'Scrivere annunci, post, email, follow-up, lettere — manualmente, ogni giorno. Ore sprecate.',
+sol_label: 'La Soluzione', sol_title: 'Due strumenti potenti.<br><em>Un sistema completo.</em>',
+how_label: 'Come Funziona', how_title: 'Semplice in <em>tre passi.</em>',
+demo_label: 'Vedi in Azione', demo_title: 'Guarda quanto è <em>semplice.</em>',
+pricing_label: 'Prezzi', pricing_title: 'Prezzi semplici e trasparenti.',
+pricing_sub: 'Nessun contratto. Nessun costo nascosto. Disdici quando vuoi.',
+cta_title: 'Smetti di scrivere.<br><em>Inizia a chiudere.</em>',
+cta_sub: 'Unisciti agli agenti che usano già Streamflux per vendere più veloce e chiudere più trattative.',
+cta_btn: 'Inizia Oggi →',
+},
+};
+
+let currentLang = 'en';
+
+function toggleLang() {
+document.getElementById('langDropdown').classList.toggle('open');
+}
+
+function setLang(code) {
+currentLang = code;
+const t = LANGS[code];
+document.getElementById('langDropdown').classList.remove('open');
+document.getElementById('langBtn').textContent = `${t.flag} ${t.code} ▾`;
+
+// Update all data-i18n elements
+document.querySelectorAll('[data-i18n]').forEach(el => {
+const key = el.getAttribute('data-i18n');
+if (t[key] !== undefined) el.innerHTML = t[key];
+});
+
+// Update lang options active state
+document.querySelectorAll('.lang-option').forEach(btn => {
+btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${code}'`));
+});
+
+// RTL for Arabic
+document.body.dir = code === 'ar' ? 'rtl' : 'ltr';
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+if (!e.target.closest('.lang-selector')) {
+document.getElementById('langDropdown').classList.remove('open');
+}
+});
+
 const observer = new IntersectionObserver((entries) => {
 entries.forEach((entry, i) => {
 if (entry.isIntersecting) setTimeout(() => entry.target.classList.add('visible'), i * 60);
