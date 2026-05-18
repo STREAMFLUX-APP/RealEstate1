@@ -10,7 +10,7 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Georgia', serif; background: #0a0c0f; color: #e8eaf0; }
-input, textarea, button { font-family: inherit; }
+input, textarea, button, select { font-family: inherit; }
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #13161b; } ::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 3px; }
 </style>
 </head>
@@ -22,8 +22,19 @@ const { useState } = React;
 const G = {
 bg: "#0a0c0f", card: "#13161b", border: "#1e2330",
 blue: "#3B7DD8", blueDim: "#1e3a6a", text: "#e8eaf0",
-muted: "#6b7280", green: "#3d9e5c",
+muted: "#6b7280", green: "#3d9e5c", gold: "#D4A843",
 };
+
+const LANGUAGES = [
+{ value: "English", label: "🇺🇸 English" },
+{ value: "Spanish", label: "🇪🇸 Español" },
+{ value: "Portuguese", label: "🇧🇷 Português" },
+{ value: "French", label: "🇫🇷 Français" },
+{ value: "Arabic", label: "🇦🇪 العربية" },
+{ value: "Chinese", label: "🇨🇳 中文" },
+{ value: "German", label: "🇩🇪 Deutsch" },
+{ value: "Italian", label: "🇮🇹 Italiano" },
+];
 
 const CLIENT_TYPES = [
 { value: "buyer_active", label: "🔥 Active Buyer", desc: "Looking now, ready to move" },
@@ -32,6 +43,7 @@ const CLIENT_TYPES = [
 { value: "seller_exploring", label: "🤔 Exploring Seller", desc: "Considering selling" },
 { value: "investor", label: "💰 Investor", desc: "Looking for ROI opportunity" },
 { value: "cold_lead", label: "❄️ Cold Lead", desc: "No prior contact" },
+{ value: "past_client", label: "🤝 Past Client", desc: "Already closed a deal together" },
 ];
 
 const CONTACT_REASONS = [
@@ -43,6 +55,17 @@ const CONTACT_REASONS = [
 { value: "market_update", label: "Market Update", desc: "Sharing market news relevant to them" },
 { value: "off_market", label: "Off-Market Deal", desc: "Exclusive property not listed publicly" },
 { value: "just_sold", label: "Just Sold Nearby", desc: "Sold a similar property nearby" },
+{ value: "referral_request", label: "Referral Request", desc: "Ask for referrals after a deal" },
+{ value: "anniversary", label: "Home Anniversary", desc: "1 year+ since they bought" },
+{ value: "objection_handle", label: "Handle Objection", desc: "They said no or not interested" },
+];
+
+const TONES = [
+{ value: "warm", label: "Warm & Personal", desc: "Friendly, human, relationship-first" },
+{ value: "professional", label: "Professional", desc: "Polished, credible, formal" },
+{ value: "urgent", label: "Urgent & Direct", desc: "Time-sensitive, act now" },
+{ value: "casual", label: "Casual & Relaxed", desc: "Low pressure, just checking in" },
+{ value: "luxury", label: "Luxury & Prestige", desc: "High-end, exclusive, aspirational" },
 ];
 
 const BUYER_CRITERIA = [
@@ -65,6 +88,16 @@ const URGENCY = [
 { value: "low", label: "🌱 Low Urgency", desc: "No rush, building relationship" },
 ];
 
+const OBJECTIONS = [
+{ value: "too_expensive", label: "Too Expensive", desc: "Price is too high" },
+{ value: "not_interested", label: "Not Interested", desc: "General rejection" },
+{ value: "happy_where_i_am", label: "Happy Where I Am", desc: "Not ready to move" },
+{ value: "already_have_agent", label: "Already Have an Agent", desc: "Working with someone else" },
+{ value: "market_too_slow", label: "Market Too Slow", desc: "Worried about selling in this market" },
+{ value: "need_more_time", label: "Need More Time", desc: "Not ready yet" },
+{ value: "bad_timing", label: "Bad Timing", desc: "Life circumstances" },
+];
+
 const TABS = [
 { id: "messages", label: "💬 WhatsApp & SMS" },
 { id: "voice", label: "🎙️ Voice Script" },
@@ -73,13 +106,21 @@ const TABS = [
 { id: "followups", label: "🔄 Follow-Ups" },
 ];
 
-function Field({ label, hint, value, onChange, placeholder, type = "text" }) {
+// Property matcher properties
+const emptyProp = () => ({ address: "", price: "", type: "", highlights: "" });
+
+function Field({ label, hint, value, onChange, placeholder, type = "text", rows }) {
 return (
 <div style={{ marginBottom: 18 }}>
 <label style={{ display: "block", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: G.muted, textTransform: "uppercase", marginBottom: 4 }}>{label}</label>
 {hint && <p style={{ fontSize: 12, color: "#4b5563", margin: "0 0 6px", fontStyle: "italic" }}>{hint}</p>}
+{rows ? (
+<textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows}
+style={{ width: "100%", background: "#0d1017", border: `1px solid ${G.border}`, borderRadius: 8, color: G.text, fontSize: 14, padding: "11px 14px", outline: "none", boxSizing: "border-box", fontFamily: "inherit", resize: "vertical" }} />
+) : (
 <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
 style={{ width: "100%", background: "#0d1017", border: `1px solid ${G.border}`, borderRadius: 8, color: G.text, fontSize: 14, padding: "11px 14px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }} />
+)}
 </div>
 );
 }
@@ -130,11 +171,11 @@ style={{ background: copied ? "#1a3a1a" : "#13161b", border: `1px solid ${copied
 );
 }
 
-const callClaude = async (apiKey, prompt, maxTokens = 1200) => {
+const callClaude = async (apiKey, prompt, maxTokens = 1300) => {
 const res = await fetch("https://api.anthropic.com/v1/messages", {
 method: "POST",
 headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-body: JSON.stringify({ model: "claude-sonnet-4-5", max_tokens: maxTokens, messages: [{ role: "user", content: prompt }] }),
+body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: maxTokens, messages: [{ role: "user", content: prompt }] }),
 });
 if (!res.ok) { const e = await res.json(); throw new Error(e?.error?.message || `API error ${res.status}`); }
 const data = await res.json();
@@ -156,26 +197,52 @@ const [loadingMsg, setLoadingMsg] = useState("");
 const [result, setResult] = useState(null);
 const [error, setError] = useState("");
 const [activeTab, setActiveTab] = useState("messages");
+const [language, setLanguage] = useState("English");
 
+// Client info
 const [clientName, setClientName] = useState("");
 const [clientType, setClientType] = useState("");
 const [contactReason, setContactReason] = useState("");
 const [urgency, setUrgency] = useState("");
+const [tone, setTone] = useState("");
+const [objection, setObjection] = useState("");
+
+// Property
 const [propAddress, setPropAddress] = useState("");
 const [propPrice, setPropPrice] = useState("");
 const [propType, setPropType] = useState("");
 const [propHighlights, setPropHighlights] = useState("");
+
+// Property matcher
+const [matcherProps, setMatcherProps] = useState([emptyProp(), emptyProp(), emptyProp()]);
+const [buyerNeeds, setBuyerNeeds] = useState("");
+
+// Buyer/seller
 const [buyerCriteria, setBuyerCriteria] = useState([]);
 const [sellerSituation, setSellerSituation] = useState([]);
 const [priorContact, setPriorContact] = useState("");
 const [personalNote, setPersonalNote] = useState("");
+const [anniversaryYears, setAnniversaryYears] = useState("");
+
+// Agent
 const [agentName, setAgentName] = useState("");
 const [agentPhone, setAgentPhone] = useState("");
 const [agencyName, setAgencyName] = useState("");
 
 const isBuyer = clientType.includes("buyer") || clientType === "investor";
 const isSeller = clientType.includes("seller");
-const canGenerate = clientName && clientType && contactReason && agentName;
+const isObjection = contactReason === "objection_handle";
+const isReferral = contactReason === "referral_request";
+const isAnniversary = contactReason === "anniversary";
+const isMatcher = contactReason === "new_listing" && isBuyer;
+
+const canGenerate = clientName && clientType && contactReason && agentName && tone;
+
+const updateMatcherProp = (idx, field, val) => {
+setMatcherProps(prev => prev.map((p, i) => i === idx ? { ...p, [field]: val } : p));
+};
+
+const langInstruction = language !== "English" ? `\n\nIMPORTANT: Write ALL content in ${language}. Every word must be in ${language}.` : "";
 
 const ctx = `
 CLIENT:
@@ -183,10 +250,13 @@ CLIENT:
 - Type: ${CLIENT_TYPES.find(t => t.value === clientType)?.label || clientType}
 - Reason for contact: ${CONTACT_REASONS.find(r => r.value === contactReason)?.label || contactReason}
 - Urgency: ${URGENCY.find(u => u.value === urgency)?.label || "not specified"}
+- Tone: ${TONES.find(t => t.value === tone)?.label || tone}
 - Prior contact history: ${priorContact || "none specified"}
 - Personal note about client: ${personalNote || "none"}
+${isObjection ? `- Objection raised: ${OBJECTIONS.find(o => o.value === objection)?.label || objection}` : ""}
+${isAnniversary ? `- Years since purchase: ${anniversaryYears || "1"}` : ""}
 
-PROPERTY BEING OFFERED:
+PROPERTY:
 - Address: ${propAddress || "not specified"}
 - Price: ${propPrice ? "$" + propPrice : "not specified"}
 - Type: ${propType || "not specified"}
@@ -194,43 +264,107 @@ PROPERTY BEING OFFERED:
 
 ${isBuyer ? `BUYER CRITERIA: ${buyerCriteria.join(", ") || "not specified"}` : ""}
 ${isSeller ? `SELLER SITUATION: ${sellerSituation.join(", ") || "not specified"}` : ""}
+${isMatcher ? `PROPERTY OPTIONS FOR MATCHING:\n${matcherProps.map((p, i) => `Option ${i+1}: ${p.address} | $${p.price} | ${p.type} | ${p.highlights}`).join("\n")}\nBUYER NEEDS: ${buyerNeeds}` : ""}
 
-AGENT:
-- Name: ${agentName}
-- Phone: ${agentPhone || "N/A"}
-- Agency: ${agencyName || "N/A"}`.trim();
+AGENT: ${agentName}${agentPhone ? " | " + agentPhone : ""}${agencyName ? " | " + agencyName : ""}`.trim();
 
 const generate = async () => {
 setError(""); setLoading(true); setResult(null);
 try {
 setLoadingMsg("✦ Writing messages & voice script...");
-const part1 = await callClaude(apiKey, `You are an elite real estate sales coach. Write highly personalised outreach messages for this agent to send to their client.
 
-${ctx}
+let part1Prompt = "";
+if (isObjection) {
+part1Prompt = `You are an elite real estate sales coach. Write objection-handling responses for this agent.
 
-Return ONLY raw JSON — no markdown, no explanation:
+${ctx}${langInstruction}
+
+Return ONLY raw JSON:
 {
-"whatsapp": "WhatsApp message. 60-80 words. Warm, personal, use the client's first name. Reference their specific situation. Create interest without being pushy. End with one easy question to get a reply.",
-"sms": "SMS message. Max 160 characters. Punchy and personal. Must fit in one text. Use client's first name. Clear CTA.",
-"voice_script": "Phone call script. Format as: OPENING (greet by name, introduce yourself warmly, 2 sentences), REASON FOR CALL (why you are calling specifically, 2-3 sentences), VALUE PITCH (what is in it for them, 2-3 sentences), CLOSE (ask for a specific next step — viewing, call, meeting, 1-2 sentences). Label each section clearly. Natural spoken language.",
-"email_subject": "Email subject line. Personal and curiosity-driving. Include client name if possible. Under 10 words.",
-"email_body": "Full email. 130-160 words. Personal opener referencing their situation. Middle section on the opportunity. Clear CTA. Professional but warm. Signed by ${agentName}${agencyName ? " from " + agencyName : ""}."
-}`, 1300);
+"whatsapp": "WhatsApp response to the objection. 60-80 words. Acknowledge their concern, reframe positively, keep door open. End with soft question.",
+"sms": "SMS response to objection. Max 160 characters. Warm, not pushy.",
+"voice_script": "Phone script to handle objection. OPENING: acknowledge their position warmly. REFRAME: present a new angle or benefit they may not have considered. QUESTION: ask one soft discovery question to understand their real concern better. CLOSE: suggest a low-commitment next step. Label each section.",
+"email_subject": "Email subject that doesn't feel like a sales email. Under 9 words.",
+"email_body": "130-150 word email that handles the objection gracefully. Acknowledge, provide value, keep relationship. Signed by ${agentName}."
+}`;
+} else if (isReferral) {
+part1Prompt = `You are an elite real estate sales coach. Write referral request messages for this agent.
 
-setLoadingMsg("✦ Writing formal letter & follow-ups...");
-const part2 = await callClaude(apiKey, `You are an elite real estate sales coach. Write a formal letter and follow-up sequence for this agent.
+${ctx}${langInstruction}
 
-${ctx}
-
-Return ONLY raw JSON — no markdown, no explanation:
+Return ONLY raw JSON:
 {
-"formal_letter": "Full formal printed letter. Format: [Date] blank line, ${clientName} blank line, [Client Address] blank line, Dear ${clientName}, then 4 paragraphs: (1) personal opening and reason for writing, (2) describe the property or opportunity specifically for their situation, (3) explain why this is the right moment for them, (4) warm close with clear next step. Sign off: Warm regards, blank line, ${agentName}${agencyName ? ", " + agencyName : ""}${agentPhone ? ", " + agentPhone : ""}. Total 260-300 words.",
-"followup_1": "Follow-up WhatsApp or SMS. 3 days after no reply. 50-60 words. Friendly nudge. Different angle from first message. Easy question at end.",
-"followup_2": "Follow-up WhatsApp or SMS. 1 week after no reply. 50-60 words. Add a new piece of information or urgency. Mention market activity or other interest.",
-"followup_3": "Follow-up WhatsApp or SMS. 2 weeks after no reply. 40-50 words. Very casual check-in. Ask if situation has changed. Keep the door open.",
-"followup_4": "Follow-up WhatsApp or SMS. 1 month after no reply. 40-50 words. Final warm touch. Mention you have other options too. No pressure. Just keeping in touch."
-}`, 1400);
+"whatsapp": "WhatsApp referral request. 60-80 words. Warm, celebrate their success, ask naturally for referrals. Easy to say yes to.",
+"sms": "SMS referral request. Max 160 characters. Short and warm.",
+"voice_script": "Phone script for referral request. OPENING: warm greeting, mention their successful transaction. CELEBRATION: make them feel good about their decision. ASK: natural referral ask — do they know anyone else who might be looking? CLOSE: thank them. Label each section.",
+"email_subject": "Referral request email subject. Personal. Under 9 words.",
+"email_body": "120-140 word referral request email. Celebrate their experience, ask for referrals naturally, offer something in return if appropriate. Signed by ${agentName}."
+}`;
+} else if (isAnniversary) {
+part1Prompt = `You are an elite real estate sales coach. Write home anniversary messages for this agent.
 
+${ctx}${langInstruction}
+
+Return ONLY raw JSON:
+{
+"whatsapp": "Home anniversary WhatsApp message. 60-80 words. Warm, celebratory, personal. Mention the home. Gentle mention of market update. No hard sell.",
+"sms": "Anniversary SMS. Max 160 characters. Warm and personal.",
+"voice_script": "Anniversary call script. OPENING: celebrate the anniversary warmly. UPDATE: share a brief market insight relevant to them. CHECK-IN: ask how they're enjoying the home. SOFT CTA: mention you're always available if they need anything or know anyone looking. Label each section.",
+"email_subject": "Anniversary email subject. Warm and personal. Under 9 words.",
+"email_body": "120-140 word anniversary email. Celebrate, share market insight, stay top of mind. Signed by ${agentName}."
+}`;
+} else {
+part1Prompt = `You are an elite real estate sales coach. Write highly personalised outreach messages.
+
+${ctx}${langInstruction}
+
+Return ONLY raw JSON:
+{
+"whatsapp": "WhatsApp message. 60-80 words. Warm, personal, use the client's first name. Reference their specific situation. End with one easy question.",
+"sms": "SMS message. Max 160 characters. Punchy and personal. Use client's first name. Clear CTA.",
+"voice_script": "Phone call script. OPENING: greet by name, introduce yourself warmly. REASON FOR CALL: why you are calling specifically. VALUE PITCH: what is in it for them. CLOSE: ask for a specific next step. Label each section. Natural spoken language.",
+"email_subject": "Email subject line. Personal and curiosity-driving. Under 10 words.",
+"email_body": "Full email. 130-160 words. Personal opener. Middle section on opportunity. Clear CTA. Signed by ${agentName}${agencyName ? " from " + agencyName : ""}."
+}`;
+}
+
+const part1 = await callClaude(apiKey, part1Prompt, 1300);
+
+setLoadingMsg("✦ Writing letter & follow-ups...");
+
+let part2Prompt = `You are an elite real estate sales coach.
+
+${ctx}${langInstruction}
+
+Return ONLY raw JSON:
+{
+"formal_letter": "Full formal printed letter. Format: [Date]\\n\\n${clientName}\\n[Client Address]\\n\\nDear ${clientName},\\n\\nParagraph 1: personal opening and reason for writing.\\nParagraph 2: describe the opportunity specifically for their situation.\\nParagraph 3: explain why this is the right moment.\\nParagraph 4: warm close with clear next step.\\n\\nWarm regards,\\n${agentName}${agencyName ? "\\n" + agencyName : ""}${agentPhone ? "\\n" + agentPhone : ""}. Total 260-300 words.",
+"followup_1": "Follow-up message. 3 days after no reply. 50-60 words. Friendly nudge. Different angle. Easy question at end.",
+"followup_2": "Follow-up message. 1 week after no reply. 50-60 words. New info or urgency. Mention market activity.",
+"followup_3": "Follow-up message. 2 weeks after no reply. 40-50 words. Very casual check-in. Keep door open.",
+"followup_4": "Follow-up message. 1 month after no reply. 40-50 words. Final warm touch. No pressure. Just keeping in touch."
+}`;
+
+// Add property matcher if applicable
+if (isMatcher && matcherProps.some(p => p.address)) {
+part2Prompt = `You are an elite real estate sales coach and property matching expert.
+
+${ctx}${langInstruction}
+
+TASK: First analyse the 3 property options and determine which one best matches this buyer's criteria and needs. Then write all outreach content recommending that specific property.
+
+Return ONLY raw JSON:
+{
+"best_match_analysis": "2-3 sentence analysis of which property (Option 1, 2, or 3) is the best match and exactly why it fits this buyer's criteria and personal situation.",
+"formal_letter": "Full formal letter recommending the best-match property. 260-300 words. Format with date, address, Dear ${clientName}, 4 paragraphs, sign off.",
+"followup_1": "Follow-up. 3 days. 50-60 words. Friendly nudge about the property recommendation.",
+"followup_2": "Follow-up. 1 week. 50-60 words. Add urgency or new info.",
+"followup_3": "Follow-up. 2 weeks. 40-50 words. Casual check-in.",
+"followup_4": "Follow-up. 1 month. 40-50 words. Final touch."
+}`;
+}
+
+const part2 = await callClaude(apiKey, part2Prompt, 1400);
 setResult({ ...part1, ...part2 });
 setActiveTab("messages");
 } catch (err) {
@@ -244,15 +378,21 @@ const card = { background: G.card, border: `1px solid ${G.border}`, borderRadius
 const btnP = (dis) => ({ background: dis ? "#1a1f2e" : G.blue, color: dis ? G.muted : "#fff", border: "none", borderRadius: 10, padding: "14px 24px", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: dis ? "not-allowed" : "pointer" });
 const btnS = { background: "transparent", color: G.muted, border: `1px solid ${G.border}`, borderRadius: 10, padding: "14px 24px", fontSize: 14, fontFamily: "inherit", cursor: "pointer" };
 
+// KEY SCREEN
 if (screen === "key") return (
 <div style={s}>
 <div style={{ maxWidth: 460, margin: "0 auto", padding: "60px 24px" }}>
 <div style={{ textAlign: "center", marginBottom: 32 }}>
 <div style={{ fontSize: 42, marginBottom: 10 }}>🤝</div>
 <h1 style={{ fontSize: 24, fontWeight: 700, margin: "0 0 6px" }}>Client Outreach Machine</h1>
-<p style={{ color: G.muted, fontSize: 13, margin: 0 }}>Generate personalised messages for any buyer or seller in seconds</p>
+<p style={{ color: G.muted, fontSize: 13, margin: 0 }}>Personalised messages for any client in seconds</p>
 </div>
 <div style={card}>
+<label style={{ display: "block", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: G.muted, textTransform: "uppercase", marginBottom: 6 }}>Output Language</label>
+<select value={language} onChange={e => setLanguage(e.target.value)}
+style={{ width: "100%", background: "#0d1017", border: `1px solid ${G.border}`, borderRadius: 8, color: G.text, fontSize: 14, padding: "11px 14px", outline: "none", marginBottom: 16, cursor: "pointer" }}>
+{LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+</select>
 <label style={{ display: "block", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: G.muted, textTransform: "uppercase", marginBottom: 6 }}>Claude API Key</label>
 <input type="password" value={apiKey} onChange={e => { setApiKey(e.target.value); setError(""); }} placeholder="sk-ant-..."
 style={{ width: "100%", background: "#0d1017", border: `1px solid ${G.border}`, borderRadius: 8, color: G.text, fontSize: 14, padding: "11px 14px", outline: "none", boxSizing: "border-box", fontFamily: "inherit", marginBottom: 10 }} />
@@ -267,13 +407,20 @@ style={{ width: "100%", background: "#0d1017", border: `1px solid ${G.border}`, 
 </div>
 );
 
+// RESULTS SCREEN
 if (result) return (
 <div style={s}>
 <div style={{ borderBottom: `1px solid ${G.border}`, padding: "16px 22px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-<span style={{ fontSize: 16, fontWeight: 700 }}>🤝 Outreach Package for {clientName}</span>
+<span style={{ fontSize: 16, fontWeight: 700 }}>🤝 Outreach Package for {clientName} — {language}</span>
 <button onClick={() => { setResult(null); setError(""); }} style={{ ...btnS, padding: "7px 14px", fontSize: 12 }}>← New Client</button>
 </div>
 <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 18px 60px" }}>
+{result.best_match_analysis && (
+<div style={{ background: "#0d1f0d", border: `1px solid ${G.green}`, borderRadius: 10, padding: "16px 18px", marginBottom: 20 }}>
+<p style={{ fontSize: 11, fontWeight: 700, color: "#4ade80", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>🏆 AI Property Match Analysis</p>
+<p style={{ color: "#d1fae5", fontSize: 14, lineHeight: 1.7 }}>{result.best_match_analysis}</p>
+</div>
+)}
 <p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>Every message personalised for {clientName}. Tap Copy and send.</p>
 <div style={{ display: "flex", gap: 7, marginBottom: 22, flexWrap: "wrap" }}>
 {TABS.map(tab => (
@@ -286,10 +433,10 @@ fontSize: 12, fontWeight: activeTab === tab.id ? 700 : 400, fontFamily: "inherit
 </div>
 {activeTab === "messages" && <>
 <OutputCard title="WhatsApp Message" icon="💬" badge="WhatsApp" content={result.whatsapp} />
-<OutputCard title="SMS Message" icon="📱" badge="SMS / 160 chars" content={result.sms} />
+<OutputCard title="SMS Message" icon="📱" badge="160 chars" content={result.sms} />
 </>}
 {activeTab === "voice" && <>
-<p style={{ color: G.muted, fontSize: 13, margin: "0 0 14px" }}>Read this naturally — don't sound like you're reading a script.</p>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 14px" }}>Read naturally — don't sound like you're reading a script.</p>
 <OutputCard title="Phone Call Script" icon="🎙️" content={result.voice_script} />
 </>}
 {activeTab === "email" && <>
@@ -301,7 +448,7 @@ fontSize: 12, fontWeight: activeTab === tab.id ? 700 : 400, fontFamily: "inherit
 <OutputCard title="Formal Letter" icon="✉️" content={result.formal_letter} />
 </>}
 {activeTab === "followups" && <>
-<p style={{ color: G.muted, fontSize: 13, margin: "0 0 14px" }}>Send these in order if no reply. Works on WhatsApp and SMS.</p>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 14px" }}>Send in order if no reply. Works on WhatsApp and SMS.</p>
 <OutputCard title="Follow-Up #1" icon="💬" badge="Day 3" content={result.followup_1} />
 <OutputCard title="Follow-Up #2" icon="💬" badge="Week 1" content={result.followup_2} />
 <OutputCard title="Follow-Up #3" icon="💬" badge="Week 2" content={result.followup_3} />
@@ -311,74 +458,102 @@ fontSize: 12, fontWeight: activeTab === tab.id ? 700 : 400, fontFamily: "inherit
 </div>
 );
 
+// FORM SCREEN
 return (
 <div style={s}>
-<div style={{ borderBottom: `1px solid ${G.border}`, padding: "16px 24px", display: "flex", alignItems: "center", gap: 10 }}>
+<div style={{ borderBottom: `1px solid ${G.border}`, padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 <span style={{ fontSize: 16, fontWeight: 700 }}>🤝 Client Outreach Machine</span>
+<span style={{ fontSize: 11, color: G.muted }}>{language}</span>
 </div>
 <div style={{ maxWidth: 660, margin: "0 auto", padding: "30px 20px 60px" }}>
 
+{/* CLIENT INFO */}
 <div style={card}>
 <h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700 }}>👤 Who Are You Contacting?</h2>
-<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>Tell us about this client. The more detail, the more personalised the messages.</p>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>The more detail, the more personalised the messages.</p>
 <Field label="Client First Name" value={clientName} onChange={setClientName} placeholder="Sarah" />
-<ChipSelect label="Client Type" hint="Who is this person?" options={CLIENT_TYPES} selected={clientType} onToggle={setClientType} single />
+<ChipSelect label="Client Type" options={CLIENT_TYPES} selected={clientType} onToggle={setClientType} single />
 <ChipSelect label="Reason for Contacting" hint="Why are you reaching out right now?" options={CONTACT_REASONS} selected={contactReason} onToggle={setContactReason} single />
 <ChipSelect label="Urgency Level" options={URGENCY} selected={urgency} onToggle={setUrgency} single />
+<ChipSelect label="Communication Tone" hint="How should the messages feel?" options={TONES} selected={tone} onToggle={setTone} single />
 </div>
 
+{/* OBJECTION HANDLER */}
+{isObjection && (
+<div style={card}>
+<h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700 }}>🛡️ What Objection Did They Raise?</h2>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>Select the objection so the AI can handle it perfectly.</p>
+<ChipSelect label="Their Objection" options={OBJECTIONS} selected={objection} onToggle={setObjection} single />
+</div>
+)}
+
+{/* ANNIVERSARY */}
+{isAnniversary && (
+<div style={card}>
+<h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700 }}>🎉 Home Anniversary Details</h2>
+<Field label="Years Since Purchase" value={anniversaryYears} onChange={setAnniversaryYears} placeholder="1" type="number" />
+</div>
+)}
+
+{/* PROPERTY */}
 <div style={card}>
 <h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700 }}>🏠 Property You're Offering</h2>
-<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>If reaching out about a specific property, fill this in. Leave blank for general outreach.</p>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>Leave blank for general outreach with no specific property.</p>
 <Field label="Property Address" value={propAddress} onChange={setPropAddress} placeholder="42 Palm Drive, Miami Beach, FL 33139" />
 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
 <Field label="Asking Price ($)" value={propPrice} onChange={setPropPrice} placeholder="1,100,000" />
 <Field label="Property Type" value={propType} onChange={setPropType} placeholder="4-bed villa with pool" />
 </div>
-<div style={{ marginBottom: 18 }}>
-<label style={{ display: "block", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: G.muted, textTransform: "uppercase", marginBottom: 4 }}>Key Highlights</label>
-<p style={{ fontSize: 12, color: "#4b5563", margin: "0 0 6px", fontStyle: "italic" }}>The top 2-3 things that make this property perfect for this client specifically.</p>
-<textarea value={propHighlights} onChange={e => setPropHighlights(e.target.value)} rows={2}
-placeholder="e.g. Ocean views, private pool, walking distance to their kids' school, just reduced by $50K"
-style={{ width: "100%", background: "#0d1017", border: `1px solid ${G.border}`, borderRadius: 8, color: G.text, fontSize: 14, padding: "11px 14px", outline: "none", boxSizing: "border-box", fontFamily: "inherit", resize: "vertical" }} />
-</div>
+<Field label="Key Highlights" hint="Top 2-3 things that make this property perfect for this client" value={propHighlights} onChange={setPropHighlights} placeholder="Ocean views, private pool, just reduced by $50K" rows={2} />
 </div>
 
-{(isBuyer || clientType === "investor") && (
+{/* PROPERTY MATCHER */}
+{isMatcher && (
+<div style={card}>
+<h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700 }}>🏆 Property Preference Matcher</h2>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>Enter up to 3 properties. The AI will analyse which best matches this buyer and pitch it perfectly.</p>
+<Field label="Buyer's Needs & Preferences" hint="Summarise what this buyer is looking for" value={buyerNeeds} onChange={setBuyerNeeds} placeholder="Wants 4 beds, pool, good schools, under $1.5M, prefers South Beach area" rows={2} />
+{matcherProps.map((p, i) => (
+<div key={i} style={{ background: "#0d1017", border: `1px solid ${G.border}`, borderRadius: 10, padding: "16px", marginBottom: 12 }}>
+<p style={{ fontSize: 11, fontWeight: 700, color: G.gold, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Option {i + 1}</p>
+<div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+<Field label="Address" value={p.address} onChange={v => updateMatcherProp(i, "address", v)} placeholder="123 Main St, Miami" />
+<Field label="Price ($)" value={p.price} onChange={v => updateMatcherProp(i, "price", v)} placeholder="1,200,000" />
+</div>
+<Field label="Property Type" value={p.type} onChange={v => updateMatcherProp(i, "type", v)} placeholder="4-bed house with pool" />
+<Field label="Key Highlights" value={p.highlights} onChange={v => updateMatcherProp(i, "highlights", v)} placeholder="Ocean view, renovated kitchen, top-rated school district" />
+</div>
+))}
+</div>
+)}
+
+{/* BUYER CRITERIA */}
+{isBuyer && !isMatcher && (
 <div style={card}>
 <h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700 }}>🔍 Buyer Criteria</h2>
-<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>What is this buyer looking for? Select all that apply.</p>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>What is this buyer looking for?</p>
 <ChipSelect label="Their Requirements" options={BUYER_CRITERIA} selected={buyerCriteria} onToggle={(v) => setBuyerCriteria(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])} />
 </div>
 )}
 
+{/* SELLER SITUATION */}
 {isSeller && (
 <div style={card}>
 <h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700 }}>🏷️ Seller Situation</h2>
-<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>What's their situation? This makes the outreach far more relevant.</p>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>What's their situation?</p>
 <ChipSelect label="Their Situation" options={SELLER_SITUATION} selected={sellerSituation} onToggle={(v) => setSellerSituation(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])} />
 </div>
 )}
 
+{/* PERSONAL CONTEXT */}
 <div style={card}>
 <h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700 }}>💡 Personal Context</h2>
-<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>Any personal details that will make the message feel more human.</p>
-<div style={{ marginBottom: 18 }}>
-<label style={{ display: "block", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: G.muted, textTransform: "uppercase", marginBottom: 4 }}>Prior Contact History</label>
-<p style={{ fontSize: 12, color: "#4b5563", margin: "0 0 6px", fontStyle: "italic" }}>Have you spoken before? What did they say?</p>
-<textarea value={priorContact} onChange={e => setPriorContact(e.target.value)} rows={2}
-placeholder="e.g. Met at open house 2 weeks ago. Said they loved the area but wanted more bedrooms. Budget is flexible."
-style={{ width: "100%", background: "#0d1017", border: `1px solid ${G.border}`, borderRadius: 8, color: G.text, fontSize: 14, padding: "11px 14px", outline: "none", boxSizing: "border-box", fontFamily: "inherit", resize: "vertical" }} />
-</div>
-<div>
-<label style={{ display: "block", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: G.muted, textTransform: "uppercase", marginBottom: 4 }}>Personal Note</label>
-<p style={{ fontSize: 12, color: "#4b5563", margin: "0 0 6px", fontStyle: "italic" }}>Anything personal you know — kids, job, lifestyle — makes messages feel real.</p>
-<textarea value={personalNote} onChange={e => setPersonalNote(e.target.value)} rows={2}
-placeholder="e.g. Has 2 young kids, works from home, loves outdoor entertaining, moving from NYC"
-style={{ width: "100%", background: "#0d1017", border: `1px solid ${G.border}`, borderRadius: 8, color: G.text, fontSize: 14, padding: "11px 14px", outline: "none", boxSizing: "border-box", fontFamily: "inherit", resize: "vertical" }} />
-</div>
+<p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>Personal details make messages feel human and real.</p>
+<Field label="Prior Contact History" hint="Have you spoken before? What did they say?" value={priorContact} onChange={setPriorContact} placeholder="Met at open house 2 weeks ago. Said they loved the area but wanted more bedrooms." rows={2} />
+<Field label="Personal Note" hint="Kids, job, lifestyle — anything personal" value={personalNote} onChange={setPersonalNote} placeholder="Has 2 young kids, works from home, loves outdoor entertaining, moving from NYC" rows={2} />
 </div>
 
+{/* AGENT */}
 <div style={card}>
 <h2 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700 }}>🏷️ Your Details</h2>
 <p style={{ color: G.muted, fontSize: 13, margin: "0 0 20px" }}>Used in sign-offs, letters and the voice script.</p>
@@ -393,13 +568,13 @@ style={{ width: "100%", background: "#0d1017", border: `1px solid ${G.border}`, 
 
 {loading && <div style={{ background: "#13161b", border: `1px solid ${G.border}`, borderRadius: 10, padding: "18px 22px", marginBottom: 16, textAlign: "center" }}>
 <p style={{ color: G.blue, fontSize: 14, margin: 0, fontWeight: 600 }}>{loadingMsg}</p>
-<p style={{ color: G.muted, fontSize: 12, margin: "6px 0 0" }}>Takes about 15-20 seconds. Please wait...</p>
+<p style={{ color: G.muted, fontSize: 12, margin: "6px 0 0" }}>Generating in {language}. Takes about 20 seconds. Please wait...</p>
 </div>}
 
 <button onClick={() => canGenerate && !loading && generate()} disabled={loading || !canGenerate} style={{ ...btnP(!canGenerate || loading), width: "100%", fontSize: 15 }}>
 {loading ? "Generating..." : "✦ Generate Full Outreach Package"}
 </button>
-{!canGenerate && <p style={{ color: G.muted, fontSize: 12, marginTop: 8, textAlign: "center" }}>Fill in client name, client type, contact reason and your name to continue.</p>}
+{!canGenerate && <p style={{ color: G.muted, fontSize: 12, marginTop: 8, textAlign: "center" }}>Fill in client name, type, contact reason, tone and your name to continue.</p>}
 </div>
 </div>
 );
