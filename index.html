@@ -615,8 +615,10 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
 
           function resetVideo(){
             ended=false;
+            v.pause();
             v.currentTime=0;
             v.style.opacity='0';
+            v.load();
             endScreen.style.display='none';
             thumb.style.opacity='1';
             bigBtn.style.display='flex';
@@ -632,7 +634,6 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
               endScreen.style.display='flex';
               endScreen.style.flexDirection='column';
               v.style.opacity='0';
-              // Reset after 10 seconds
               setTimeout(resetVideo,10000);
             }
           }
