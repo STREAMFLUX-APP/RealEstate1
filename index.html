@@ -106,9 +106,10 @@ nav {
 
 .hero-sub {
   font-size: 18px; font-weight: 400;
-  color: var(--white-dim); line-height: 1.65;
+  color: var(--white-dim); line-height: 1.75;
   max-width: 500px; margin: 0 auto 40px;
   position: relative; z-index: 2;
+  overflow: visible; padding-bottom: 4px;
   animation: fadeUp 0.6s 0.2s ease both;
 }
 
@@ -504,14 +505,19 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
   <h1 class="hero-title" data-i18n="hero_title">
     Market faster.<br>Close <em>more.</em>
   </h1>
-  <p class="hero-sub" data-i18n="hero_sub">Your full marketing package generated in seconds. Fill in the details, we do the rest.</p>
+  <p class="hero-sub" data-i18n="hero_sub">Watch your full marketing and outreach package write itself. Fill in the details, we do the rest.</p>
   <div class="hero-ctas">
     <a href="#pricing" class="btn-primary" data-i18n="hero_cta1">Start Free Trial →</a>
     <a href="#solution" class="btn-outline" data-i18n="hero_cta2">See the Tools</a>
   </div>
   <div class="hero-video-wrap">
     <div class="hero-video-inner" style="background:#080808;" id="sfWrap">
-      <video id="sfVideo" style="width:100%;height:100%;position:absolute;top:0;left:0;background:#080808;outline:none;" preload="metadata">
+      <!-- Animated thumbnail background — plays silently before main video starts -->
+      <video id="sfThumb" style="width:100%;height:100%;position:absolute;top:0;left:0;object-fit:cover;opacity:1;transition:opacity 0.5s;" autoplay muted loop playsinline>
+        <source src="https://res.cloudinary.com/delqqntjq/video/upload/v1779984011/u9965328198_A_premium_ultra-realistic_thumbnail_image_for_a_r_ee63e820-ddde-4dbb-858c-99c572c88c91_0_x2v9xq.mp4" type="video/mp4">
+      </video>
+      <!-- Main demo video — hidden until play is clicked -->
+      <video id="sfVideo" style="width:100%;height:100%;position:absolute;top:0;left:0;background:#080808;outline:none;opacity:0;transition:opacity 0.5s;" preload="metadata">
         <source src="https://res.cloudinary.com/delqqntjq/video/upload/v1779982201/STREAMFLUX_3_osxgkn.mov" type="video/mp4">
       </video>
       <!-- Black overlay shown when video ends -->
@@ -547,10 +553,24 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
           var playIcon=document.getElementById('sfPlayIcon');
           var timeEl=document.getElementById('sfTime');
           function fmt(s){var m=Math.floor(s/60);var sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
-          bigBtn.addEventListener('click',function(){endScreen.style.display='none';v.play();bigBtn.style.display='none';});
+          var thumb=document.getElementById('sfThumb');
+          bigBtn.addEventListener('click',function(){
+            endScreen.style.display='none';
+            thumb.style.opacity='0';
+            v.style.opacity='1';
+            v.play();
+            bigBtn.style.display='none';
+          });
           bigBtn.addEventListener('mouseover',function(){bigBtn.style.transform='translate(-50%,-50%) scale(1.1)';bigBtn.style.boxShadow='0 0 50px rgba(42,184,212,0.8)';});
           bigBtn.addEventListener('mouseout',function(){bigBtn.style.transform='translate(-50%,-50%) scale(1)';bigBtn.style.boxShadow='0 0 40px rgba(42,184,212,0.6)';});
-          v.addEventListener('ended',function(){v.currentTime=0;endScreen.style.display='block';bigBtn.style.display='flex';pauseIcon.style.display='none';playIcon.style.display='block';bar.style.width='0%';controls.style.opacity='0';});
+          v.addEventListener('ended',function(){
+            v.currentTime=0;v.style.opacity='0';
+            thumb.style.opacity='1';
+            endScreen.style.display='none';
+            bigBtn.style.display='flex';
+            pauseIcon.style.display='none';playIcon.style.display='block';
+            bar.style.width='0%';controls.style.opacity='0';
+          });
           toggle.addEventListener('click',function(){if(v.paused){v.play();}else{v.pause();}});
           v.addEventListener('play',function(){pauseIcon.style.display='block';playIcon.style.display='none';controls.style.opacity='1';});
           v.addEventListener('pause',function(){pauseIcon.style.display='none';playIcon.style.display='block';});
@@ -935,7 +955,7 @@ const LANGS = {
     nav_tools: 'The Tools', nav_how: 'How It Works', nav_demo: 'Demo', nav_pricing: 'Pricing', nav_cta: 'Get Started',
     badge: 'AI-Powered Real Estate Marketing',
     hero_title: 'Market faster.<br>Close <em>more.</em>',
-    hero_sub: 'Your full marketing package generated in seconds. Fill in the details, we do the rest.',
+    hero_sub: 'Watch your full marketing and outreach package write itself. Fill in the details, we do the rest.',
     hero_cta1: 'Start Free Trial →', hero_cta2: 'See the Tools',
     prob_label: 'The Problem', prob_title: 'Agents are <em>drowning</em><br>in repetitive work.',
     prob_sub: 'Writing listings, social posts, emails, follow-ups, letters — manually, every day. Hours wasted. Deals missed. Money left on the table.',
@@ -953,7 +973,7 @@ const LANGS = {
     nav_tools: 'Las Herramientas', nav_how: 'Cómo Funciona', nav_demo: 'Demo', nav_pricing: 'Precios', nav_cta: 'Empezar',
     badge: 'Marketing Inmobiliario con IA',
     hero_title: 'Vende más rápido.<br>Cierra <em>más.</em>',
-    hero_sub: 'Tu paquete completo de marketing generado en segundos. Rellena los datos, nosotros hacemos el resto.',
+    hero_sub: 'Observa cómo tu paquete completo de marketing y captación se escribe solo. Rellena los datos, nosotros hacemos el resto.',
     hero_cta1: 'Prueba Gratis →', hero_cta2: 'Ver las Herramientas',
     prob_label: 'El Problema', prob_title: 'Los agentes se <em>ahogan</em><br>en trabajo repetitivo.',
     prob_sub: 'Escribir listados, publicaciones, emails, seguimientos, cartas — manualmente, cada día. Horas perdidas. Tratos perdidos.',
