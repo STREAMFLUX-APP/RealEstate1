@@ -520,14 +520,22 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
       <video id="sfVideo" style="width:100%;height:100%;position:absolute;top:0;left:0;background:#080808;outline:none;opacity:0;transition:opacity 0.5s;" preload="metadata">
         <source src="https://res.cloudinary.com/delqqntjq/video/upload/v1779982201/STREAMFLUX_3_osxgkn.mov" type="video/mp4">
       </video>
-      <!-- Black end overlay -->
-      <div id="sfEndScreen" style="display:none;position:absolute;inset:0;background:#080808;z-index:8;border-radius:12px;transition:opacity 0.3s;"></div>
+          <!-- Black end overlay with CTA -->
+          <div id="sfEndScreen" style="display:none;position:absolute;inset:0;background:#080808;z-index:8;border-radius:12px;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;pointer-events:all;">
+            <div style="font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#2AB8D4;margin-bottom:12px;">Ready to try it?</div>
+            <div style="font-size:22px;font-weight:700;color:#ffffff;margin-bottom:8px;">Start your free trial today.</div>
+            <div style="font-size:13px;color:#888;margin-bottom:24px;">No card required. 14-day free trial.</div>
+            <a href="#pricing" onclick="document.getElementById('sfEndScreen').style.display='none';" style="background:#2AB8D4;color:#080808;text-decoration:none;font-weight:700;font-size:15px;padding:16px 36px;border-radius:10px;display:inline-block;box-shadow:0 0 30px rgba(42,184,212,0.4);cursor:pointer;">Start Free Trial →</a>
+            <div style="margin-top:16px;">
+              <button id="sfReplay" style="background:transparent;border:1px solid #333;color:#666;font-size:12px;padding:8px 20px;border-radius:6px;cursor:pointer;font-family:inherit;">↺ Watch again</button>
+            </div>
+          </div>
       <!-- Rotate phone message — mobile only -->
       <div id="sfRotate" style="display:none;position:absolute;inset:0;background:rgba(8,8,8,0.92);z-index:11;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;">
         <div style="font-size:40px;margin-bottom:12px;">↺</div>
         <p style="font-size:14px;font-weight:700;color:#ffffff;margin-bottom:6px;">Rotate your phone</p>
         <p style="font-size:12px;color:#888;">For the best experience, watch in landscape mode</p>
-        <button id="sfRotateSkip" style="margin-top:16px;background:#2AB8D4;color:#080808;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Watch anyway</button>
+        <button id="sfRotateSkip" style="margin-top:16px;background:#2AB8D4;color:#080808;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Watch now</button>
       </div>
       <!-- Big aqua play button -->
       <div id="sfPlayBtn" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:76px;height:76px;background:#2AB8D4;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;box-shadow:0 0 40px rgba(42,184,212,0.6);transition:all 0.2s;">
@@ -594,15 +602,22 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
             controls.style.opacity='0';
           }
           v.addEventListener('ended',function(){
-            // Immediately cover with black then reset
-            endScreen.style.display='block';
-            endScreen.style.opacity='1';
-            setTimeout(resetVideo,300);
+            setTimeout(resetVideo,100);
+          });
+          v.addEventListener('timeupdate',function(){
+            if(v.duration&&v.currentTime>=v.duration-1.5&&!v.paused){
+              endScreen.style.display='flex';endScreen.style.flexDirection='column';
+              v.style.opacity='0';
+            }
+            if(v.duration){bar.style.width=(v.currentTime/v.duration*100)+'%';timeEl.textContent=fmt(v.currentTime)+' / '+fmt(v.duration);}
+          });
+          document.getElementById('sfReplay').addEventListener('click',function(){
+            endScreen.style.display='none';
+            resetVideo();
           });
           toggle.addEventListener('click',function(){if(v.paused){v.play();}else{v.pause();}});
           v.addEventListener('play',function(){pauseIcon.style.display='block';playIcon.style.display='none';controls.style.opacity='1';});
           v.addEventListener('pause',function(){pauseIcon.style.display='none';playIcon.style.display='block';});
-          v.addEventListener('timeupdate',function(){if(v.duration){bar.style.width=(v.currentTime/v.duration*100)+'%';timeEl.textContent=fmt(v.currentTime)+' / '+fmt(v.duration);}});
           progress.addEventListener('click',function(e){var rect=progress.getBoundingClientRect();var pct=(e.clientX-rect.left)/rect.width;v.currentTime=pct*v.duration;});
           wrap.addEventListener('mouseenter',function(){if(!v.paused||v.currentTime>0)controls.style.opacity='1';});
           wrap.addEventListener('mouseleave',function(){controls.style.opacity='0';});
