@@ -590,7 +590,26 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
           rotateSkip.addEventListener('click',function(){rotateMsg.style.display='none';startVideo();});
           bigBtn.addEventListener('mouseover',function(){bigBtn.style.transform='translate(-50%,-50%) scale(1.1)';bigBtn.style.boxShadow='0 0 50px rgba(42,184,212,0.8)';});
           bigBtn.addEventListener('mouseout',function(){bigBtn.style.transform='translate(-50%,-50%) scale(1)';bigBtn.style.boxShadow='0 0 40px rgba(42,184,212,0.6)';});
+          var ended=false;
+          v.addEventListener('ended',function(){
+            if(!ended){ended=true;endScreen.style.display='flex';endScreen.style.flexDirection='column';v.style.opacity='0';setTimeout(resetVideo,2000);}
+          });
+          v.addEventListener('webkitendfullscreen',function(){
+            if(v.ended||v.currentTime>=v.duration-0.5){endScreen.style.display='flex';endScreen.style.flexDirection='column';v.style.opacity='0';ended=true;setTimeout(resetVideo,2000);}
+          });
+          v.addEventListener('timeupdate',function(){
+            if(v.duration){
+              var remaining=v.duration-v.currentTime;
+              if(remaining<=2.5&&!v.paused&&!ended){
+                endScreen.style.display='flex';endScreen.style.flexDirection='column';
+                v.style.opacity='0';
+              }
+              bar.style.width=(v.currentTime/v.duration*100)+'%';
+              timeEl.textContent=fmt(v.currentTime)+' / '+fmt(v.duration);
+            }
+          });
           function resetVideo(){
+            ended=false;
             v.currentTime=0;
             v.style.opacity='0';
             endScreen.style.display='none';
@@ -601,16 +620,6 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
             bar.style.width='0%';
             controls.style.opacity='0';
           }
-          v.addEventListener('ended',function(){
-            setTimeout(resetVideo,100);
-          });
-          v.addEventListener('timeupdate',function(){
-            if(v.duration&&v.currentTime>=v.duration-1.5&&!v.paused){
-              endScreen.style.display='flex';endScreen.style.flexDirection='column';
-              v.style.opacity='0';
-            }
-            if(v.duration){bar.style.width=(v.currentTime/v.duration*100)+'%';timeEl.textContent=fmt(v.currentTime)+' / '+fmt(v.duration);}
-          });
           document.getElementById('sfReplay').addEventListener('click',function(){
             endScreen.style.display='none';
             resetVideo();
