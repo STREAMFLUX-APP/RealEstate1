@@ -179,12 +179,18 @@ nav {
 /* ── FULL FEATURES ── */
 .features-full { padding: 100px 48px; background: var(--black); }
 
+.features-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 0;
+}
 .features-app-block {
   background: var(--black-2);
   border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
-  margin-bottom: 32px;
+  margin-bottom: 0;
 }
 
 .features-app-header {
@@ -292,7 +298,7 @@ nav {
 .pain-card:hover { background: var(--black-3); }
 .pain-icon { font-size: 28px; margin-bottom: 16px; display: block; }
 .pain-title { font-family: 'Instrument Serif', Georgia, serif; font-size: 20px; color: var(--white); margin-bottom: 10px; }
-.pain-desc { font-size: 14px; color: var(--white-dim); line-height: 1.7; font-weight: 400; }
+.pain-desc { font-size: 13px; color: var(--white-dim); line-height: 1.7; font-weight: 400; }
 
 /* ── SOLUTION ── */
 .solution { padding: 100px 48px; background: var(--black-2); }
@@ -429,6 +435,7 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
   .features-grid { grid-template-columns: 1fr; }
   .features-col { border-right: none; }
   .features-app-num { font-size: 40px; }
+  .features-two-col { grid-template-columns: 1fr; gap: 16px; }
   footer { padding: 28px 20px; flex-direction: column; text-align: center; }
   .apps-grid { grid-template-columns: 1fr; }
   .pricing-card.featured { transform: none; }
@@ -436,7 +443,7 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
   .steps { grid-template-columns: 1fr; }
   .step { border-right: none; border-bottom: 1px solid var(--border); }
   .step:last-child { border-bottom: none; }
-  .pain-grid { grid-template-columns: repeat(2, 1fr); }
+  .pain-grid { grid-template-columns: 1fr; }
   .pain-card { border-right: none; border-bottom: 1px solid var(--border); }
   .pain-card:last-child { border-bottom: none; }
 }
@@ -696,70 +703,14 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
 
 <hr class="section-divider">
 
-<!-- SOLUTION -->
-<section class="solution" id="solution">
+<!-- FULL FEATURES -->
+<section class="features-full" id="solution">
   <div class="section-inner">
     <div class="section-label fade-up">The Solution</div>
     <h2 class="section-title fade-up">Two powerful tools.<br><em>One complete system.</em></h2>
     <p class="section-sub fade-up">Streamflux replaces your copywriter, social media manager, and follow-up VA — all in one AI-powered platform built exclusively for real estate agents.</p>
-    <div class="apps-grid">
-      <div class="app-card fade-up">
-        <div class="app-card-header">
-          <div class="app-number">01</div>
-          <div class="app-tag">App One</div>
-          <div class="app-name">Property Marketing Machine</div>
-          <div class="app-desc">New listing. Generate your entire marketing package in 30 seconds.</div>
-        </div>
-        <div class="app-card-body">
-          <ul class="app-features">
-            <li>MLS listing description — professional grade</li>
-            <li>Instagram caption with hashtags and emojis</li>
-            <li>Facebook caption with full property details</li>
-            <li>Twitter / X post — punchy, under 240 chars</li>
-            <li>LinkedIn post for your professional network</li>
-            <li>Email subject line + full email body</li>
-            <li>SMS blast — under 160 characters</li>
-            <li>WhatsApp broadcast message</li>
-            <li>Google Ad copy + Facebook Ad copy</li>
-            <li>TikTok video script — hook, body, CTA</li>
-            <li>Neighbour letter to generate referrals</li>
-          </ul>
-        </div>
-      </div>
-      <div class="app-card fade-up">
-        <div class="app-card-header">
-          <div class="app-number">02</div>
-          <div class="app-tag">App Two</div>
-          <div class="app-name">Client Outreach Machine</div>
-          <div class="app-desc">Buyer or seller to contact. Generate a fully personalised outreach package.</div>
-        </div>
-        <div class="app-card-body">
-          <ul class="app-features">
-            <li>Personalised WhatsApp message for each client</li>
-            <li>SMS message — under 160 characters</li>
-            <li>Full phone call script — opening, pitch, close</li>
-            <li>Email subject line + professional email body</li>
-            <li>Formal printed letter ready to post</li>
-            <li>4 follow-up messages — Day 3, Week 1, Week 2, Month 1</li>
-            <li>Tailored for buyers, sellers, investors, cold leads</li>
-            <li>Matches urgency level and client situation</li>
-            <li>Uses client name and personal context throughout</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<hr class="section-divider">
-
-<!-- FULL FEATURES -->
-<section class="features-full" id="features">
-  <div class="section-inner">
-    <div class="section-label fade-up">Everything Included</div>
-    <h2 class="section-title fade-up">The complete list of<br><em>what you get.</em></h2>
-    <p class="section-sub fade-up">No hidden limitations. No watered-down features. Here is every single thing both apps generate — in full detail.</p>
-
+    <div class="features-two-col">
     <!-- APP 1 FEATURES -->
     <div class="features-app-block fade-up">
       <div class="features-app-header">
@@ -896,6 +847,7 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
       </div>
     </div>
 
+    </div>
   </div>
 </section>
 
@@ -927,26 +879,6 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
   </div>
 </section>
 
-<hr class="section-divider">
-
-<!-- DEMO -->
-<section class="demo" id="demo">
-  <div class="section-inner">
-    <div class="section-label fade-up">See It In Action</div>
-    <h2 class="section-title fade-up">Watch how <em>simple it is.</em></h2>
-    <p class="section-sub fade-up">See Streamflux generate a complete property marketing package in 30 seconds. No complicated setup. No learning curve. Just results.</p>
-    <div class="demo-video-wrap fade-up">
-      <div class="demo-video-inner">
-        <div class="demo-placeholder">
-          <div class="demo-play-btn">▶</div>
-          <p class="demo-placeholder-text">Demo video coming soon</p>
-          <p class="demo-placeholder-sub">A 60-second screen recording showing Streamflux generating a full marketing package in real time</p>
-        </div>
-      </div>
-    </div>
-    <div class="demo-cta fade-up"><a href="#pricing" class="btn-primary">Try It Free →</a></div>
-  </div>
-</section>
 
 <!-- TESTIMONIAL -->
 <section class="testimonial">
