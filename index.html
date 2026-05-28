@@ -627,19 +627,20 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
             v.style.opacity='0';
             v.load();
             endScreen.style.display='none';
+            controls.style.display='flex';
+            controls.style.opacity='0';
             thumb.style.opacity='1';
             bigBtn.style.display='flex';
             pauseIcon.style.display='none';
             playIcon.style.display='block';
             bar.style.width='0%';
-            controls.style.opacity='0';
           }
 
           function showEndScreen(){
             if(!ended){
               ended=true;
               controls.style.opacity='0';
-              controls.style.pointerEvents='none';
+              controls.style.display='none';
               endScreen.style.display='flex';
               endScreen.style.flexDirection='column';
               v.style.opacity='0';
