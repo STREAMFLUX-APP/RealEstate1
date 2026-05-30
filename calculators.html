@@ -1,1 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Real Estate Calculators — Streamflux</title>
+<meta name="description" content="Free real estate calculators for agents. Seller net sheet and commission split calculator. No signup required.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Syne',sans-serif;background:#080808;color:#fff;line-height:1.6}
 
+nav{background:#0d0d0d;border-bottom:1px solid #222;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{font-size:20px;font-weight:700;letter-spacing:3px;color:#fff;text-decoration:none}
+.logo span{color:#2AB8D4}
+.nav-cta{background:#2AB8D4;color:#080808;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:9px 18px;border-radius:8px;border:none;cursor:pointer;text-decoration:none}
+
+.hero{text-align:center;padding:60px 24px 40px}
+.hero-tag{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#2AB8D4;margin-bottom:12px}
+.hero h1{font-family:'Instrument Serif',serif;font-size:clamp(28px,5vw,52px);font-weight:400;line-height:1.1;margin-bottom:14px}
+.hero h1 em{font-style:italic;color:#2AB8D4}
+.hero p{font-size:16px;color:rgba(255,255,255,0.6);max-width:500px;margin:0 auto}
+
+.tabs-row{display:flex;gap:8px;justify-content:center;padding:0 24px 40px;flex-wrap:wrap}
+.tab-btn{background:#111;border:1px solid #333;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.5);cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.2s}
+.tab-btn.active{background:#2AB8D4;color:#080808;border-color:#2AB8D4}
+
+.calc-wrap{max-width:680px;margin:0 auto;padding:0 24px 80px}
+
+.calc-section{display:none}
+.calc-section.active{display:block}
+
+.calc-card{background:#111;border:1px solid #222;border-radius:14px;padding:28px;margin-bottom:16px}
+.section-title{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#2AB8D4;margin-bottom:18px}
+
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.field-row.single{grid-template-columns:1fr}
+.field-group{display:flex;flex-direction:column;gap:5px}
+label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.5)}
+input,select{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;color:#fff;font-size:14px;padding:11px 14px;outline:none;font-family:'Syne',sans-serif;width:100%;transition:border-color 0.2s}
+input:focus,select:focus{border-color:#2AB8D4}
+.prefix-wrap{position:relative}
+.prefix-wrap span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.4);font-size:14px;pointer-events:none}
+.prefix-wrap input{padding-left:26px}
+
+.result-card{background:#0a1f24;border:1px solid rgba(42,184,212,0.3);border-radius:14px;padding:28px;margin-top:20px}
+.result-title{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#2AB8D4;margin-bottom:20px}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.result-row:last-child{border-bottom:none}
+.result-row.total{margin-top:8px;padding-top:14px;border-top:2px solid rgba(42,184,212,0.4);border-bottom:none}
+.result-label{font-size:13px;color:rgba(255,255,255,0.6)}
+.result-label.sub{font-size:12px;color:rgba(255,255,255,0.35);padding-left:12px}
+.result-value{font-size:14px;font-weight:700;color:#fff}
+.result-value.negative{color:#f87171}
+.result-value.positive{color:#4ade80}
+.result-value.big{font-size:22px;color:#2AB8D4}
+
+.calc-btn{background:#2AB8D4;color:#080808;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px;width:100%;border:none;border-radius:10px;cursor:pointer;margin-top:16px;transition:opacity 0.2s}
+.calc-btn:hover{opacity:0.9}
+
+.divider{height:1px;background:#1a1a1a;margin:8px 0}
+
+.cta-banner{background:#111;border:1px solid #222;border-radius:14px;padding:32px;text-align:center;margin-top:48px}
+.cta-banner h3{font-family:'Instrument Serif',serif;font-size:24px;font-weight:400;margin-bottom:8px}
+.cta-banner h3 em{font-style:italic;color:#2AB8D4}
+.cta-banner p{font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:20px}
+.cta-banner a{background:#2AB8D4;color:#080808;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:13px 28px;border-radius:10px;text-decoration:none;display:inline-block}
+
+footer{background:#0d0d0d;border-top:1px solid #222;padding:24px;text-align:center;font-size:13px;color:rgba(255,255,255,0.3)}
+footer a{color:#2AB8D4;text-decoration:none}
+
+@media(max-width:600px){
+  .field-row{grid-template-columns:1fr}
+  nav{padding:14px 20px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://streamflux.app" class="logo">STREAM<span>FLUX</span></a>
+  <a href="https://app.streamflux.app" class="nav-cta">Start Free Trial →</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Free Tools</div>
+  <h1>Real Estate<br><em>Calculators</em></h1>
+  <p>Two free calculators every agent needs. No signup. No email. Just answers.</p>
+</div>
+
+<div class="tabs-row">
+  <button class="tab-btn active" onclick="switchTab('net')">💰 Seller Net Sheet</button>
+  <button class="tab-btn" onclick="switchTab('commission')">🤝 Commission Split</button>
+</div>
+
+<div class="calc-wrap">
+
+  <!-- SELLER NET SHEET -->
+  <div class="calc-section active" id="calc-net">
+    <div class="calc-card">
+      <div class="section-title">🏠 Property Details</div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Sale Price ($)</label>
+          <div class="prefix-wrap"><span>$</span><input type="number" id="n-sale-price" placeholder="850,000" oninput="calcNet()"></div>
+        </div>
+        <div class="field-group">
+          <label>Mortgage Balance ($)</label>
+          <div class="prefix-wrap"><span>$</span><input type="number" id="n-mortgage" placeholder="0" oninput="calcNet()"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-card">
+      <div class="section-title">💸 Selling Costs</div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Total Commission (%)</label>
+          <input type="number" id="n-commission" placeholder="5" step="0.1" oninput="calcNet()">
+        </div>
+        <div class="field-group">
+          <label>Closing Costs ($)</label>
+          <div class="prefix-wrap"><span>$</span><input type="number" id="n-closing" placeholder="3,000" oninput="calcNet()"></div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Repairs / Staging ($)</label>
+          <div class="prefix-wrap"><span>$</span><input type="number" id="n-repairs" placeholder="0" oninput="calcNet()"></div>
+        </div>
+        <div class="field-group">
+          <label>Property Taxes Owed ($)</label>
+          <div class="prefix-wrap"><span>$</span><input type="number" id="n-taxes" placeholder="0" oninput="calcNet()"></div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>HOA Fees Owed ($)</label>
+          <div class="prefix-wrap"><span>$</span><input type="number" id="n-hoa" placeholder="0" oninput="calcNet()"></div>
+        </div>
+        <div class="field-group">
+          <label>Other Costs ($)</label>
+          <div class="prefix-wrap"><span>$</span><input type="number" id="n-other" placeholder="0" oninput="calcNet()"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-card" id="net-result" style="display:none">
+      <div class="result-title">📊 Seller Net Sheet</div>
+      <div class="result-row">
+        <span class="result-label">Sale Price</span>
+        <span class="result-value" id="r-sale-price">—</span>
+      </div>
+      <div class="divider"></div>
+      <div class="result-row">
+        <span class="result-label negative" style="color:#f87171">Deductions</span>
+        <span class="result-value"></span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">Mortgage Payoff</span>
+        <span class="result-value negative" id="r-mortgage">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">Agent Commission</span>
+        <span class="result-value negative" id="r-commission">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">Closing Costs</span>
+        <span class="result-value negative" id="r-closing">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">Repairs / Staging</span>
+        <span class="result-value negative" id="r-repairs">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">Property Taxes</span>
+        <span class="result-value negative" id="r-taxes">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">HOA Fees</span>
+        <span class="result-value negative" id="r-hoa">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">Other Costs</span>
+        <span class="result-value negative" id="r-other">—</span>
+      </div>
+      <div class="result-row total">
+        <span class="result-label" style="font-weight:700;color:#fff;font-size:15px">Estimated Net Proceeds</span>
+        <span class="result-value big" id="r-net">—</span>
+      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:16px">This is an estimate only. Actual proceeds may vary. Consult your agent and title company for exact figures.</p>
+    </div>
+  </div>
+
+  <!-- COMMISSION SPLIT -->
+  <div class="calc-section" id="calc-commission">
+    <div class="calc-card">
+      <div class="section-title">🏠 Sale Details</div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Sale Price ($)</label>
+          <div class="prefix-wrap"><span>$</span><input type="number" id="c-sale-price" placeholder="850,000" oninput="calcCommission()"></div>
+        </div>
+        <div class="field-group">
+          <label>Total Commission (%)</label>
+          <input type="number" id="c-total-commission" placeholder="5" step="0.1" oninput="calcCommission()">
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-card">
+      <div class="section-title">🤝 Split Structure</div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Listing Agent Split (%)</label>
+          <input type="number" id="c-listing-pct" placeholder="50" oninput="calcCommission()">
+        </div>
+        <div class="field-group">
+          <label>Buyer's Agent Split (%)</label>
+          <input type="number" id="c-buyer-pct" placeholder="50" oninput="calcCommission()">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label>Listing Brokerage Split (%)</label>
+          <input type="number" id="c-listing-brokerage" placeholder="30" oninput="calcCommission()">
+        </div>
+        <div class="field-group">
+          <label>Buyer Brokerage Split (%)</label>
+          <input type="number" id="c-buyer-brokerage" placeholder="30" oninput="calcCommission()">
+        </div>
+      </div>
+      <div class="field-row single">
+        <div class="field-group">
+          <label>Transaction Fee ($)</label>
+          <div class="prefix-wrap"><span>$</span><input type="number" id="c-transaction-fee" placeholder="0" oninput="calcCommission()"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-card" id="commission-result" style="display:none">
+      <div class="result-title">📊 Commission Breakdown</div>
+      <div class="result-row">
+        <span class="result-label">Total Commission</span>
+        <span class="result-value" id="rc-total">—</span>
+      </div>
+      <div class="divider"></div>
+      <div class="result-row">
+        <span class="result-label">Listing Side Total</span>
+        <span class="result-value" id="rc-listing-side">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">Listing Brokerage</span>
+        <span class="result-value" id="rc-listing-brokerage">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub" style="color:#2AB8D4;font-weight:700">Listing Agent Takes Home</span>
+        <span class="result-value positive" id="rc-listing-agent">—</span>
+      </div>
+      <div class="divider"></div>
+      <div class="result-row">
+        <span class="result-label">Buyer's Side Total</span>
+        <span class="result-value" id="rc-buyer-side">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">Buyer's Brokerage</span>
+        <span class="result-value" id="rc-buyer-brokerage">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub" style="color:#2AB8D4;font-weight:700">Buyer's Agent Takes Home</span>
+        <span class="result-value positive" id="rc-buyer-agent">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label sub">Transaction Fee</span>
+        <span class="result-value negative" id="rc-fee">—</span>
+      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:16px">This is an estimate only. Your actual split may vary based on your brokerage agreement.</p>
+    </div>
+  </div>
+
+  <div class="cta-banner">
+    <h3>Market every listing in<br><em>30 seconds.</em></h3>
+    <p>MLS description, all social media, ads, TikTok script, neighbour letter — and a full client outreach machine. Try Streamflux free for 14 days.</p>
+    <a href="https://app.streamflux.app">Start Free Trial →</a>
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2026 Streamflux AI LTD · <a href="https://streamflux.app">streamflux.app</a> · <a href="mailto:francisco@streamflux.app">francisco@streamflux.app</a></p>
+</footer>
+
+<script>
+function fmt(n){return"$"+Math.round(n).toLocaleString();}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.calc-section').forEach(s=>s.classList.remove('active'));
+  if(tab==='net'){
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('calc-net').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('calc-commission').classList.add('active');
+  }
+}
+
+function calcNet(){
+  const sale=parseFloat(document.getElementById('n-sale-price').value)||0;
+  if(!sale){document.getElementById('net-result').style.display='none';return;}
+  const mortgage=parseFloat(document.getElementById('n-mortgage').value)||0;
+  const commPct=parseFloat(document.getElementById('n-commission').value)||0;
+  const closing=parseFloat(document.getElementById('n-closing').value)||0;
+  const repairs=parseFloat(document.getElementById('n-repairs').value)||0;
+  const taxes=parseFloat(document.getElementById('n-taxes').value)||0;
+  const hoa=parseFloat(document.getElementById('n-hoa').value)||0;
+  const other=parseFloat(document.getElementById('n-other').value)||0;
+  const comm=sale*(commPct/100);
+  const net=sale-mortgage-comm-closing-repairs-taxes-hoa-other;
+  document.getElementById('net-result').style.display='block';
+  document.getElementById('r-sale-price').textContent=fmt(sale);
+  document.getElementById('r-mortgage').textContent=mortgage>0?`-${fmt(mortgage)}`:'$0';
+  document.getElementById('r-commission').textContent=comm>0?`-${fmt(comm)}`:'$0';
+  document.getElementById('r-closing').textContent=closing>0?`-${fmt(closing)}`:'$0';
+  document.getElementById('r-repairs').textContent=repairs>0?`-${fmt(repairs)}`:'$0';
+  document.getElementById('r-taxes').textContent=taxes>0?`-${fmt(taxes)}`:'$0';
+  document.getElementById('r-hoa').textContent=hoa>0?`-${fmt(hoa)}`:'$0';
+  document.getElementById('r-other').textContent=other>0?`-${fmt(other)}`:'$0';
+  const netEl=document.getElementById('r-net');
+  netEl.textContent=fmt(Math.abs(net));
+  netEl.style.color=net>=0?'#2AB8D4':'#f87171';
+}
+
+function calcCommission(){
+  const sale=parseFloat(document.getElementById('c-sale-price').value)||0;
+  if(!sale){document.getElementById('commission-result').style.display='none';return;}
+  const totalPct=parseFloat(document.getElementById('c-total-commission').value)||0;
+  const listingPct=parseFloat(document.getElementById('c-listing-pct').value)||50;
+  const buyerPct=parseFloat(document.getElementById('c-buyer-pct').value)||50;
+  const listBrokeragePct=parseFloat(document.getElementById('c-listing-brokerage').value)||30;
+  const buyBrokeragePct=parseFloat(document.getElementById('c-buyer-brokerage').value)||30;
+  const fee=parseFloat(document.getElementById('c-transaction-fee').value)||0;
+  const total=sale*(totalPct/100);
+  const listingSide=total*(listingPct/100);
+  const buyerSide=total*(buyerPct/100);
+  const listBrokerage=listingSide*(listBrokeragePct/100);
+  const listAgent=listingSide-listBrokerage-fee;
+  const buyBrokerage=buyerSide*(buyBrokeragePct/100);
+  const buyAgent=buyerSide-buyBrokerage-fee;
+  document.getElementById('commission-result').style.display='block';
+  document.getElementById('rc-total').textContent=fmt(total);
+  document.getElementById('rc-listing-side').textContent=fmt(listingSide);
+  document.getElementById('rc-listing-brokerage').textContent=fmt(listBrokerage);
+  document.getElementById('rc-listing-agent').textContent=fmt(listAgent);
+  document.getElementById('rc-buyer-side').textContent=fmt(buyerSide);
+  document.getElementById('rc-buyer-brokerage').textContent=fmt(buyBrokerage);
+  document.getElementById('rc-buyer-agent').textContent=fmt(buyAgent);
+  document.getElementById('rc-fee').textContent=fee>0?`-${fmt(fee)}`:'$0';
+}
+</script>
+</body>
+</html>
