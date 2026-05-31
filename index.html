@@ -545,7 +545,7 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
         <button id="sfRotateSkip" style="margin-top:16px;background:#2AB8D4;color:#080808;border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Watch now</button>
       </div>
       <!-- Big aqua play button -->
-      <div id="sfPlayBtn" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:76px;height:76px;background:#2AB8D4;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;box-shadow:0 0 40px rgba(42,184,212,0.6);transition:all 0.2s;">
+      <div id="sfPlayBtn" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:76px;height:76px;background:#2AB8D4;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;box-shadow:0 0 40px rgba(42,184,212,0.6);transition:all 0.3s;opacity:0;">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="#080808" style="margin-left:4px;"><polygon points="5,3 19,12 5,21"/></svg>
       </div>
       <!-- Controls bar — sits higher so it never covers end screen buttons -->
@@ -627,6 +627,13 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
           bigBtn.addEventListener('mouseover',function(){bigBtn.style.transform='translate(-50%,-50%) scale(1.1)';bigBtn.style.boxShadow='0 0 50px rgba(42,184,212,0.8)';});
           bigBtn.addEventListener('mouseout',function(){bigBtn.style.transform='translate(-50%,-50%) scale(1)';bigBtn.style.boxShadow='0 0 40px rgba(42,184,212,0.6)';});
 
+          var isTouch=!window.matchMedia('(hover:hover)').matches;
+          if(isTouch){
+            bigBtn.style.opacity='1';
+          }
+          wrap.addEventListener('mouseenter',function(){if(!isTouch&&bigBtn.style.display!=='none')bigBtn.style.opacity='1';});
+          wrap.addEventListener('mouseleave',function(){if(!isTouch&&bigBtn.style.display!=='none')bigBtn.style.opacity='0';});
+
           function resetVideo(){
             ended=false;
             v.pause();
@@ -638,6 +645,7 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
             controls.style.opacity='0';
             thumb.style.opacity='1';
             bigBtn.style.display='flex';
+            bigBtn.style.opacity=isTouch?'1':'0';
             pauseIcon.style.display='none';
             playIcon.style.display='block';
             bar.style.width='0%';
