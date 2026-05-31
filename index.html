@@ -180,8 +180,8 @@ nav {
 .features-full { padding: 100px 48px; background: var(--black); }
 
 .features-two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 24px;
   margin-top: 0;
 }
@@ -234,7 +234,7 @@ nav {
 
 .features-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0;
 }
 .features-col {
@@ -439,7 +439,7 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
   .features-grid { grid-template-columns: 1fr; }
   .features-col { border-right: none; }
   .features-app-num { font-size: 40px; }
-  .features-two-col { grid-template-columns: 1fr; gap: 16px; }
+  .features-two-col { gap: 16px; }
   footer { padding: 28px 20px; flex-direction: column; text-align: center; }
   .apps-grid { grid-template-columns: 1fr; }
   .pricing-card.featured { transform: none; }
@@ -849,7 +849,6 @@ footer { background: var(--black-2); padding: 44px 56px; display: flex; justify-
             <li>8 output languages — English, Spanish, Portuguese, French, Arabic, Chinese, German, Italian</li>
           </ul>
         </div>
-        <div class="features-col" style="border-right:none;background:transparent;"></div>
       </div>
     </div>
 
